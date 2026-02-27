@@ -3,14 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>贪吃蛇游戏</title>
+    <title>🐍 贪吃蛇 - 春节版</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div id="game-container">
         <div id="start-screen" class="screen">
-            <h1 class="game-title">贪吃蛇</h1>
-            <div class="high-score">最高分: <span id="high-score">0</span></div>
+            <div class="festive-decoration">
+                <span class="lantern lantern-left">🏮</span>
+                <span class="lantern lantern-right">🏮</span>
+            </div>
+            <h1 class="game-title">🐍 贪吃蛇</h1>
+            <p class="subtitle">🎊 春节特别版 🎊</p>
+            <div class="high-score">🏆 最高分: <span id="high-score">0</span></div>
             <div class="difficulty-selector">
                 <h3>选择难度</h3>
                 <div class="difficulty-buttons">
@@ -19,7 +24,7 @@
                     <button class="difficulty-btn" data-difficulty="hard">困难</button>
                 </div>
             </div>
-            <button id="start-btn" class="main-btn">开始游戏</button>
+            <button id="start-btn" class="main-btn">🧧 开始游戏</button>
         </div>
 
         <div id="game-screen" class="screen hidden">
@@ -32,7 +37,7 @@
                     <span class="label">等级</span>
                     <span id="current-level" class="value">1</span>
                 </div>
-                <button id="pause-btn" class="pause-btn">暂停</button>
+                <button id="pause-btn" class="pause-btn">⏸ 暂停</button>
             </div>
             <div class="progress-container">
                 <div class="progress-label">升级进度</div>
@@ -44,28 +49,28 @@
             <canvas id="game-canvas"></canvas>
             <div id="mobile-controls" class="mobile-controls">
                 <div class="control-row">
-                    <button class="control-btn" data-direction="up">▲</button>
+                    <button class="control-btn" data-direction="up">⬆</button>
                 </div>
                 <div class="control-row">
-                    <button class="control-btn" data-direction="left">◀</button>
-                    <button class="control-btn" data-direction="down">▼</button>
-                    <button class="control-btn" data-direction="right">▶</button>
+                    <button class="control-btn" data-direction="left">⬅</button>
+                    <button class="control-btn" data-direction="down">⬇</button>
+                    <button class="control-btn" data-direction="right">➡</button>
                 </div>
             </div>
         </div>
 
         <div id="pause-screen" class="screen hidden overlay">
             <div class="pause-content">
-                <h2>游戏暂停</h2>
-                <button id="resume-btn" class="main-btn">继续游戏</button>
-                <button id="restart-from-pause-btn" class="secondary-btn">重新开始</button>
-                <button id="menu-btn" class="secondary-btn">返回主菜单</button>
+                <h2>⏸ 游戏暂停</h2>
+                <button id="resume-btn" class="main-btn">▶ 继续游戏</button>
+                <button id="restart-from-pause-btn" class="secondary-btn">🔄 重新开始</button>
+                <button id="menu-btn" class="secondary-btn">🏠 返回主菜单</button>
             </div>
         </div>
 
         <div id="end-screen" class="screen hidden overlay">
             <div class="end-content">
-                <h2>游戏结束</h2>
+                <h2>💔 游戏结束</h2>
                 <div class="final-stats">
                     <div class="stat-item">
                         <span class="stat-label">本局得分</span>
@@ -75,20 +80,21 @@
                         <span class="stat-label">达到等级</span>
                         <span id="final-level" class="stat-value">1</span>
                     </div>
-                    <div id="new-record" class="new-record hidden">新纪录!</div>
+                    <div id="new-record" class="new-record hidden">🎉 新纪录! 🎉</div>
                 </div>
-                <button id="restart-btn" class="main-btn">重新开始</button>
-                <button id="back-menu-btn" class="secondary-btn">返回主菜单</button>
+                <button id="restart-btn" class="main-btn">🔄 再来一局</button>
+                <button id="back-menu-btn" class="secondary-btn">🏠 返回主菜单</button>
             </div>
         </div>
 
         <div id="level-up-notification" class="level-up-notification hidden">
-            <span>升级!</span>
+            <span>🎊 升级!</span>
             <span id="new-level">2</span>
         </div>
     </div>
 
     <script src="js/utils.js"></script>
+    <script src="js/audio.js"></script>
     <script src="js/food.js"></script>
     <script src="js/snake.js"></script>
     <script src="js/game.js"></script>

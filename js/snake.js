@@ -14,6 +14,7 @@ class Snake {
         this.direction = Direction.RIGHT;
         this.nextDirection = Direction.RIGHT;
         this.growing = false;
+        this.animationFrame = 0;
         this.init();
     }
 
@@ -60,6 +61,8 @@ class Snake {
         } else {
             this.growing = false;
         }
+        
+        this.animationFrame++;
     }
 
     grow() {
@@ -93,80 +96,241 @@ class Snake {
     }
 
     draw(ctx) {
-        this.body.forEach((segment, index) => {
+        for (let i = this.body.length - 1; i >= 0; i--) {
+            const segment = this.body[i];
             const x = segment.x * this.cellSize;
             const y = segment.y * this.cellSize;
             const size = this.cellSize;
             
-            const hue = 140 + (index * 2) % 60;
-            const saturation = 70 - (index * 0.5);
-            const lightness = index === 0 ? 55 : 45 - (index * 0.3);
-            
-            ctx.fillStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-            
-            const padding = 1;
-            const radius = 4;
-            
-            ctx.beginPath();
-            ctx.roundRect(
-                x + padding, 
-                y + padding, 
-                size - padding * 2, 
-                size - padding * 2, 
-                radius
-            );
-            ctx.fill();
-            
-            if (index === 0) {
+            if (i === 0) {
                 this.drawHead(ctx, x, y, size);
+            } else {
+                this.drawBody(ctx, x, y, size, i);
             }
-            
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-            ctx.lineWidth = 1;
-            ctx.stroke();
-        });
+        }
     }
 
     drawHead(ctx, x, y, size) {
-        const eyeSize = size * 0.15;
-        const eyeOffset = size * 0.25;
+        const centerX = x + size / 2;
+        const centerY = y + size / 2;
+        const radius = size * 0.45;
         
-        ctx.fillStyle = '#fff';
+        const gradient = ctx.createRadialGradient(
+            centerX - radius * 0.3, centerY - radius * 0.3, 0,
+            centerX, centerY, radius
+        );
+        gradient.addColorStop(0, '#ff6b6b');
+        gradient.addColorStop(0.5, '#e63946');
+        gradient.addColorStop(1, '#9d0208');
         
-        let eye1X, eye1Y, eye2X, eye2Y;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
         
-        if (this.direction === Direction.RIGHT) {
-            eye1X = x + size * 0.7;
-            eye1Y = y + eyeOffset;
-            eye2X = x + size * 0.7;
-            eye2Y = y + size - eyeOffset;
-        } else if (this.direction === Direction.LEFT) {
-            eye1X = x + size * 0.3;
-            eye1Y = y + eyeOffset;
-            eye2X = x + size * 0.3;
-            eye2Y = y + size - eyeOffset;
-        } else if (this.direction === Direction.UP) {
-            eye1X = x + eyeOffset;
-            eye1Y = y + size * 0.3;
-            eye2X = x + size - eyeOffset;
-            eye2Y = y + size * 0.3;
+        ctx.strokeStyle = '#ffd700';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        this.drawFestiveHat(ctx, centerX, centerY, radius);
+        this.drawCuteFace(ctx, centerX, centerY, radius);
+    }
+
+    drawFestiveHat(ctx, centerX, centerY, radius) {
+        const hatOffset = this.direction === Direction.DOWN ? radius * 0.8 : -radius * 0.6;
+        const hatY = centerY + hatOffset;
+        
+        ctx.save();
+        
+        if (this.direction === Direction.DOWN) {
+            ctx.translate(centerX, hatY);
+            ctx.rotate(Math.PI);
         } else {
-            eye1X = x + eyeOffset;
-            eye1Y = y + size * 0.7;
-            eye2X = x + size - eyeOffset;
-            eye2Y = y + size * 0.7;
+            ctx.translate(centerX, hatY);
         }
         
         ctx.beginPath();
-        ctx.arc(eye1X, eye1Y, eyeSize, 0, Math.PI * 2);
-        ctx.arc(eye2X, eye2Y, eyeSize, 0, Math.PI * 2);
+        ctx.moveTo(-radius * 0.5, 0);
+        ctx.lineTo(0, -radius * 0.8);
+        ctx.lineTo(radius * 0.5, 0);
+        ctx.closePath();
+        
+        const hatGradient = ctx.createLinearGradient(0, 0, 0, -radius * 0.8);
+        hatGradient.addColorStop(0, '#ffd700');
+        hatGradient.addColorStop(1, '#ff6b6b');
+        ctx.fillStyle = hatGradient;
         ctx.fill();
         
-        ctx.fillStyle = '#000';
         ctx.beginPath();
-        ctx.arc(eye1X, eye1Y, eyeSize * 0.5, 0, Math.PI * 2);
-        ctx.arc(eye2X, eye2Y, eyeSize * 0.5, 0, Math.PI * 2);
+        ctx.arc(0, -radius * 0.8, radius * 0.15, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffd700';
         ctx.fill();
+        
+        ctx.restore();
+    }
+
+    drawCuteFace(ctx, centerX, centerY, radius) {
+        const eyeOffsetX = radius * 0.25;
+        const eyeOffsetY = radius * 0.1;
+        const eyeSize = radius * 0.2;
+        
+        let leftEyeX, leftEyeY, rightEyeX, rightEyeY;
+        
+        if (this.direction === Direction.RIGHT) {
+            leftEyeX = centerX + eyeOffsetX;
+            leftEyeY = centerY - eyeOffsetY;
+            rightEyeX = centerX + eyeOffsetX;
+            rightEyeY = centerY + eyeOffsetY;
+        } else if (this.direction === Direction.LEFT) {
+            leftEyeX = centerX - eyeOffsetX;
+            leftEyeY = centerY - eyeOffsetY;
+            rightEyeX = centerX - eyeOffsetX;
+            rightEyeY = centerY + eyeOffsetY;
+        } else if (this.direction === Direction.UP) {
+            leftEyeX = centerX - eyeOffsetX;
+            leftEyeY = centerY - eyeOffsetY;
+            rightEyeX = centerX + eyeOffsetX;
+            rightEyeY = centerY - eyeOffsetY;
+        } else {
+            leftEyeX = centerX - eyeOffsetX;
+            leftEyeY = centerY + eyeOffsetY;
+            rightEyeX = centerX + eyeOffsetX;
+            rightEyeY = centerY + eyeOffsetY;
+        }
+        
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.ellipse(leftEyeX, leftEyeY, eyeSize * 1.3, eyeSize * 1.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(rightEyeX, rightEyeY, eyeSize * 1.3, eyeSize * 1.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.fillStyle = '#1a1a2e';
+        ctx.beginPath();
+        ctx.arc(leftEyeX + eyeSize * 0.2, leftEyeY, eyeSize * 0.6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(rightEyeX + eyeSize * 0.2, rightEyeY, eyeSize * 0.6, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(leftEyeX + eyeSize * 0.3, leftEyeY - eyeSize * 0.3, eyeSize * 0.25, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(rightEyeX + eyeSize * 0.3, rightEyeY - eyeSize * 0.3, eyeSize * 0.25, 0, Math.PI * 2);
+        ctx.fill();
+        
+        const blushOffset = radius * 0.35;
+        ctx.fillStyle = 'rgba(255, 150, 150, 0.5)';
+        ctx.beginPath();
+        ctx.ellipse(centerX - blushOffset, centerY + radius * 0.15, radius * 0.12, radius * 0.08, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(centerX + blushOffset, centerY + radius * 0.15, radius * 0.12, radius * 0.08, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        const mouthY = centerY + radius * 0.25;
+        ctx.strokeStyle = '#1a1a2e';
+        ctx.lineWidth = 1.5;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.arc(centerX, mouthY - radius * 0.1, radius * 0.12, 0.2 * Math.PI, 0.8 * Math.PI);
+        ctx.stroke();
+    }
+
+    drawBody(ctx, x, y, size, index) {
+        const centerX = x + size / 2;
+        const centerY = y + size / 2;
+        const radius = size * 0.42;
+        
+        const hue = 0;
+        const saturation = 80 - (index * 1) % 30;
+        const lightness = 45 - (index * 0.5) % 15;
+        
+        const gradient = ctx.createRadialGradient(
+            centerX - radius * 0.3, centerY - radius * 0.3, 0,
+            centerX, centerY, radius
+        );
+        gradient.addColorStop(0, `hsl(${hue}, ${saturation}%, ${lightness + 20}%)`);
+        gradient.addColorStop(0.7, `hsl(${hue}, ${saturation}%, ${lightness}%)`);
+        gradient.addColorStop(1, `hsl(${hue}, ${saturation}%, ${lightness - 10}%)`);
+        
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+        
+        ctx.strokeStyle = 'rgba(255, 215, 0, 0.6)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        
+        if (index % 3 === 0) {
+            this.drawPattern(ctx, centerX, centerY, radius, index);
+        }
+    }
+
+    drawPattern(ctx, centerX, centerY, radius, index) {
+        const patterns = ['lantern', 'cloud', 'coin'];
+        const pattern = patterns[index % patterns.length];
+        
+        ctx.save();
+        ctx.globalAlpha = 0.7;
+        
+        switch (pattern) {
+            case 'lantern':
+                this.drawMiniLantern(ctx, centerX, centerY, radius * 0.4);
+                break;
+            case 'cloud':
+                this.drawMiniCloud(ctx, centerX, centerY, radius * 0.35);
+                break;
+            case 'coin':
+                this.drawMiniCoin(ctx, centerX, centerY, radius * 0.35);
+                break;
+        }
+        
+        ctx.restore();
+    }
+
+    drawMiniLantern(ctx, x, y, size) {
+        ctx.fillStyle = '#ffd700';
+        ctx.beginPath();
+        ctx.ellipse(x, y, size * 0.8, size, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.fillStyle = '#ff6b6b';
+        ctx.beginPath();
+        ctx.ellipse(x, y, size * 0.6, size * 0.8, 0, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    drawMiniCloud(ctx, x, y, size) {
+        ctx.fillStyle = 'rgba(255, 215, 0, 0.8)';
+        ctx.beginPath();
+        ctx.arc(x - size * 0.4, y, size * 0.5, 0, Math.PI * 2);
+        ctx.arc(x, y - size * 0.2, size * 0.6, 0, Math.PI * 2);
+        ctx.arc(x + size * 0.4, y, size * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    drawMiniCoin(ctx, x, y, size) {
+        ctx.fillStyle = '#ffd700';
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.strokeStyle = '#b8860b';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(x, y, size * 0.7, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        ctx.fillStyle = '#b8860b';
+        ctx.font = `bold ${size}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('福', x, y + 1);
     }
 
     getHead() {

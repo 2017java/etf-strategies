@@ -58,6 +58,8 @@ class Game {
         this.newRecordDisplay = document.getElementById('new-record');
         this.levelUpNotification = document.getElementById('level-up-notification');
         this.newLevelDisplay = document.getElementById('new-level');
+        
+        this.soundToggle = document.getElementById('sound-toggle');
     }
 
     initCanvas() {
@@ -97,6 +99,10 @@ class Game {
             }
             this.initCanvas();
         }, 250));
+        
+        if (this.soundToggle) {
+            this.soundToggle.addEventListener('click', () => this.toggleSound());
+        }
     }
 
     selectDifficulty(e) {
@@ -161,6 +167,8 @@ class Game {
     }
 
     startGame() {
+        audioManager.init();
+        
         this.score = 0;
         this.level = 1;
         this.levelScore = 0;
@@ -175,6 +183,8 @@ class Game {
         
         this.isRunning = true;
         this.isPaused = false;
+        
+        audioManager.startBGM();
         this.runGameLoop();
     }
 
@@ -197,10 +207,17 @@ class Game {
         
         if (this.snake.checkFoodCollision(this.food)) {
             const points = this.food.getScore();
+            const foodType = this.food.type;
             this.score += points;
             this.levelScore += points;
             this.snake.grow();
             this.food.spawn(this.snake.body);
+            
+            if (foodType === FoodType.DIAMOND || foodType === FoodType.CROWN) {
+                audioManager.playDiamondSound();
+            } else {
+                audioManager.playEatSound();
+            }
             
             this.checkLevelUp();
             this.updateUI();
@@ -221,6 +238,7 @@ class Game {
             const settings = DifficultySettings[this.difficulty];
             this.currentSpeed = Math.max(50, this.currentSpeed * (1 - settings.speedIncrease));
             
+            audioManager.playLevelUpSound();
             this.showLevelUp();
         }
     }
@@ -235,16 +253,34 @@ class Game {
     }
 
     render() {
-        this.ctx.fillStyle = '#0a0a1a';
+        this.ctx.fillStyle = '#1a0a0a';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
+        this.drawFestiveBackground();
         this.drawGrid();
         this.food.draw(this.ctx);
         this.snake.draw(this.ctx);
     }
 
+    drawFestiveBackground() {
+        this.ctx.save();
+        this.ctx.globalAlpha = 0.1;
+        
+        for (let i = 0; i < 5; i++) {
+            const x = (Math.sin(Date.now() / 2000 + i) * 0.5 + 0.5) * this.canvas.width;
+            const y = (Math.cos(Date.now() / 3000 + i * 2) * 0.5 + 0.5) * this.canvas.height;
+            
+            this.ctx.fillStyle = i % 2 === 0 ? '#ff6b6b' : '#ffd700';
+            this.ctx.beginPath();
+            this.ctx.arc(x, y, 30, 0, Math.PI * 2);
+            this.ctx.fill();
+        }
+        
+        this.ctx.restore();
+    }
+
     drawGrid() {
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+        this.ctx.strokeStyle = 'rgba(255, 100, 100, 0.05)';
         this.ctx.lineWidth = 1;
         
         for (let x = 0; x <= this.canvas.width; x += this.grid.cellSize) {
@@ -282,15 +318,35 @@ class Game {
         this.isPaused = !this.isPaused;
         
         if (this.isPaused) {
+            audioManager.stopBGM();
             this.showScreen('pause');
         } else {
+            audioManager.startBGM();
             this.hideOverlay();
             this.runGameLoop();
         }
     }
 
+    toggleSound() {
+        if (this.soundToggle) {
+            const isMuted = this.soundToggle.classList.toggle('muted');
+            if (isMuted) {
+                audioManager.stopBGM();
+                audioManager.setSFXVolume(0);
+            } else {
+                audioManager.setSFXVolume(0.3);
+                if (this.isRunning && !this.isPaused) {
+                    audioManager.startBGM();
+                }
+            }
+        }
+    }
+
     gameOver() {
         this.isRunning = false;
+        
+        audioManager.stopBGM();
+        audioManager.playGameOverSound();
         
         if (this.gameLoop) {
             clearTimeout(this.gameLoop);
@@ -320,6 +376,8 @@ class Game {
     returnToMenu() {
         this.isRunning = false;
         this.isPaused = false;
+        
+        audioManager.stopBGM();
         
         if (this.gameLoop) {
             clearTimeout(this.gameLoop);
