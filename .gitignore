@@ -3,3 +3,6 @@
 Thumbs.db
 *.log
 node_modules/
+
+# Nested git repositories (managed independently)
+ClaudeProjects/senior-car-control-app/
