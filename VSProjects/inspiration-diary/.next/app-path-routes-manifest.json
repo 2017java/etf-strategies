@@ -1,0 +1,21 @@
+{
+  "/[id]/page": "/[id]",
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/api/ai/analyze/route": "/api/ai/analyze",
+  "/api/ai/image/route": "/api/ai/image",
+  "/api/ai/voice/route": "/api/ai/voice",
+  "/api/inspirations/[id]/route": "/api/inspirations/[id]",
+  "/api/inspirations/route": "/api/inspirations",
+  "/api/stats/route": "/api/stats",
+  "/api/tags/route": "/api/tags",
+  "/api/todos/[id]/route": "/api/todos/[id]",
+  "/api/todos/[id]/subtasks/[subtaskId]/route": "/api/todos/[id]/subtasks/[subtaskId]",
+  "/api/todos/route": "/api/todos",
+  "/api/upload/route": "/api/upload",
+  "/favicon.ico/route": "/favicon.ico",
+  "/new/page": "/new",
+  "/page": "/",
+  "/stats/page": "/stats",
+  "/todos/page": "/todos"
+}

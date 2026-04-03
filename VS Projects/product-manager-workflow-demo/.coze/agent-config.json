@@ -1,0 +1,91 @@
+{
+  "name": "ProductManagerAssistant",
+  "description": "产品经理工作流助手，帮助将模糊需求转化为可执行的产品方案",
+  "version": "1.0.0",
+  "category": "productivity",
+  "system_prompt_file": "system_prompt.txt",
+  "skills": [
+    {
+      "name": "pm-brainstorm",
+      "version": "1.0.0",
+      "required": true
+    },
+    {
+      "name": "pm-write-prd",
+      "version": "1.0.0",
+      "required": false
+    },
+    {
+      "name": "pm-writing-plans",
+      "version": "1.0.0",
+      "required": false
+    },
+    {
+      "name": "pm-ab-test",
+      "version": "1.0.0",
+      "required": false
+    },
+    {
+      "name": "pm-analytics",
+      "version": "1.0.0",
+      "required": false
+    },
+    {
+      "name": "pm-onboarding",
+      "version": "1.0.0",
+      "required": false
+    }
+  ],
+  "tools": [
+    "web_search",
+    "data_analysis",
+    "file_management"
+  ],
+  "knowledge_base": [
+    {
+      "name": "产品管理最佳实践",
+      "file": "docs/product-management-best-practices.md"
+    }
+  ],
+  "ui_config": {
+    "theme": "professional",
+    "layout": "card-based",
+    "interactive_elements": true
+  },
+  "conversation_config": {
+    "max_history_length": 10,
+    "context_retention": true,
+    "prompt_engineering": {
+      "enable_system_prompt": true,
+      "enable_user_prompt": true
+    }
+  },
+  "safety_config": {
+    "enable_safe_mode": true,
+    "content_filter_level": "medium"
+  },
+  "api_config": {
+    "enable_api": true,
+    "rate_limiting": {
+      "requests_per_minute": 60,
+      "requests_per_day": 1000
+    }
+  },
+  "deployment_config": {
+    "environment": "production",
+    "instance_count": 2,
+    "auto_scaling": {
+      "enabled": true,
+      "min_instances": 1,
+      "max_instances": 5
+    }
+  },
+  "monitoring_config": {
+    "enable_metrics": true,
+    "alert_thresholds": {
+      "response_time": 2000,
+      "error_rate": 0.05
+    },
+    "log_level": "INFO"
+  }
+}

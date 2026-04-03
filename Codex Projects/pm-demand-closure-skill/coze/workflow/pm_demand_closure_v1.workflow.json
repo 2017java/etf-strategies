@@ -1,0 +1,58 @@
+{
+  "workflow_name": "pm_demand_closure_v1",
+  "version": "1.0.0",
+  "description": "Product manager demand closure workflow for Coze MVP",
+  "nodes": [
+    {
+      "name": "input_parse",
+      "type": "logic",
+      "input": ["raw_request", "business_background", "current_state", "target_metrics"],
+      "output": ["normalized_input", "missing_fields", "route_flags"]
+    },
+    {
+      "name": "clarify_requirement",
+      "type": "llm",
+      "input": ["normalized_input", "missing_fields"],
+      "output": ["requirement_brief", "clarification_notes", "is_ready_for_prd"]
+    },
+    {
+      "name": "generate_prd",
+      "type": "llm",
+      "input": ["requirement_brief"],
+      "output": ["prd_draft"]
+    },
+    {
+      "name": "generate_plan",
+      "type": "llm",
+      "input": ["requirement_brief", "prd_draft"],
+      "output": ["implementation_plan"]
+    },
+    {
+      "name": "design_ab_test",
+      "type": "llm",
+      "input": ["requirement_brief", "target_metrics"],
+      "output": ["experiment_spec"]
+    },
+    {
+      "name": "design_tracking",
+      "type": "llm",
+      "input": ["requirement_brief", "experiment_spec"],
+      "output": ["tracking_spec", "ux_compliance"]
+    },
+    {
+      "name": "bundle_output",
+      "type": "template",
+      "input": ["clarification_notes", "prd_draft", "implementation_plan", "experiment_spec", "tracking_spec", "ux_compliance"],
+      "output": ["delivery_bundle", "demo_summary"]
+    }
+  ],
+  "edges": [
+    ["input_parse", "clarify_requirement"],
+    ["clarify_requirement", "generate_prd"],
+    ["generate_prd", "generate_plan"],
+    ["generate_plan", "design_ab_test"],
+    ["design_ab_test", "design_tracking"],
+    ["design_tracking", "bundle_output"]
+  ]
+}
+

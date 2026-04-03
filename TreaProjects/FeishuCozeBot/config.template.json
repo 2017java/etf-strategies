@@ -1,0 +1,13 @@
+{
+  "feishu": {
+    "app_id": "your_app_id",
+    "app_secret": "your_app_secret",
+    "default_app_token": "your_default_app_token",
+    "default_table_id": "your_default_table_id"
+  },
+  "coze": {
+    "api_url": "https://your-coze-api-url/stream_run",
+    "api_token": "your_coze_api_token",
+    "bot_id": "your_bot_id"
+  }
+}
