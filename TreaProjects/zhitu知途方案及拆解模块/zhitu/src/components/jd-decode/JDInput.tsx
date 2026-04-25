@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Clipboard, Upload, Search, Loader2, FileText } from 'lucide-react';
+import { Clipboard, Upload, Search, Loader2 } from 'lucide-react';
 
 interface JDInputProps {
   onAnalyze: (text: string) => void;
