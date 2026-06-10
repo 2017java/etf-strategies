@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+akshare
+pandas
+numpy
+pydantic
+httpx
+python-dotenv
+pyarrow
