@@ -12,14 +12,14 @@ def _nav(rets, start):
 def test_annual_return_compound():
     nav = _nav([0.001] * 250, date(2024, 1, 1))
     m = compute_metrics(nav, trades=[], initial_cash=1_000_000)
-    assert abs(m["annual_return"] - 0.286) < 0.01
+    assert abs(m["annual_return"] - 0.4427) < 0.01
 
 def test_max_drawdown_negative():
     rets = [0.05, -0.10, 0.03, -0.08, 0.02]
     nav = _nav(rets, date(2024, 1, 1))
     m = compute_metrics(nav, trades=[], initial_cash=1_000_000)
     assert m["max_drawdown"] < 0
-    assert abs(m["max_drawdown"] - (-0.13)) < 0.005
+    assert abs(m["max_drawdown"] - (-0.1472)) < 0.005
 
 def test_sharpe_zero_when_flat():
     nav = _nav([0.0] * 100, date(2024, 1, 1))

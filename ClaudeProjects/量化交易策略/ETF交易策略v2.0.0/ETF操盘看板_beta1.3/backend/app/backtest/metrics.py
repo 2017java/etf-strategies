@@ -14,7 +14,7 @@ def compute_metrics(
         }
     days = (nav.index[-1] - nav.index[0]).days
     years = max(days / 365.25, 1e-9)
-    annual_return = nav.iloc[-1] - 1
+    annual_return = nav.iloc[-1] ** (1 / years) - 1
 
     daily_ret = nav.pct_change().dropna()
     std = daily_ret.std(ddof=0)
@@ -25,7 +25,7 @@ def compute_metrics(
 
     cummax = nav.cummax()
     drawdown = (nav - cummax) / cummax
-    max_drawdown = drawdown.iloc[-1]
+    max_drawdown = drawdown.min()
 
     calmar = annual_return / abs(max_drawdown) if max_drawdown < 0 else 0.0
 
