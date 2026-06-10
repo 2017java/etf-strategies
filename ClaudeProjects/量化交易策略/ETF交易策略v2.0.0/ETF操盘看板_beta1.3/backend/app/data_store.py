@@ -1,3 +1,6 @@
+"""OHLCV parquet 缓存模块。
+注意：save() 是 read-modify-write 模式，**单进程写**才安全，多 worker 并发写同一 code 会丢数据。
+"""
 import pandas as pd
 from pathlib import Path
 from datetime import date, timedelta
@@ -9,7 +12,9 @@ logger = logging.getLogger(__name__)
 class OHLCVStore:
     """按 code 分文件的 parquet 缓存，交易日历粗略过滤（剔除周末）。"""
 
-    def __init__(self, root: Path | str = "data/ohlcv"):
+    def __init__(self, root: Path | str | None = None):
+        if root is None:
+            root = Path(__file__).resolve().parent.parent / "data" / "ohlcv"
         self.root = Path(root)
         self.root.mkdir(parents=True, exist_ok=True)
 
@@ -36,7 +41,11 @@ class OHLCVStore:
             f = self._file(str(code))
             if not f.exists():
                 continue
-            sub = pd.read_parquet(f)
+            try:
+                sub = pd.read_parquet(f)
+            except Exception as e:
+                logger.warning("load() skip corrupted %s: %s", code, e)
+                continue
             sub.index = pd.to_datetime(sub.index).date
             sub = sub.loc[(sub.index >= start) & (sub.index <= end)]
             if sub.empty:

@@ -34,3 +34,12 @@ def test_get_trading_calendar_filters_weekends(tmp_path):
     assert date(2024, 1, 1) in cal
     assert date(2024, 1, 6) not in cal
     assert date(2024, 1, 7) not in cal
+
+def test_load_skips_corrupted_parquet(tmp_path):
+    """损坏的 parquet 文件不应导致 load 崩溃。"""
+    store = OHLCVStore(root=tmp_path / "ohlcv")
+    (tmp_path / "ohlcv").mkdir(parents=True, exist_ok=True)
+    bad = tmp_path / "ohlcv" / "510300.parquet"
+    bad.write_bytes(b"this is not a valid parquet file at all")
+    df = store.load(["510300"], date(2024, 1, 1), date(2024, 1, 31))
+    assert df.empty
