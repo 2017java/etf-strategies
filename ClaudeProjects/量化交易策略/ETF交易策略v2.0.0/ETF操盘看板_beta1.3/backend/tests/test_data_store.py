@@ -1,5 +1,6 @@
 import pandas as pd
 from datetime import date
+from unittest.mock import patch
 from app.data_store import OHLCVStore
 
 def test_store_creates_root_dir(tmp_path):
@@ -43,3 +44,16 @@ def test_load_skips_corrupted_parquet(tmp_path):
     bad.write_bytes(b"this is not a valid parquet file at all")
     df = store.load(["510300"], date(2024, 1, 1), date(2024, 1, 31))
     assert df.empty
+
+def test_ensure_calls_akshare_when_missing(tmp_path):
+    store = OHLCVStore(root=tmp_path / "ohlcv")
+    fake_df = pd.DataFrame({
+        "date": ["2024-01-02", "2024-01-03"],
+        "open": [3.5, 3.6], "high": [3.6, 3.7],
+        "low": [3.4, 3.5], "close": [3.55, 3.65],
+        "volume": [1000, 2000],
+    })
+    with patch("app.data_store.ak.fund_etf_hist_sina", return_value=fake_df) as mock_ak:
+        store.ensure(["510300"], date(2024, 1, 1), date(2024, 1, 31))
+        mock_ak.assert_called_once()
+        assert (tmp_path / "ohlcv" / "510300.parquet").exists()

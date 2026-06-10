@@ -6,6 +6,7 @@ from pathlib import Path
 from datetime import date, timedelta
 from typing import Iterable
 import logging
+import akshare as ak
 
 logger = logging.getLogger(__name__)
 
@@ -70,4 +71,27 @@ class OHLCVStore:
 
     def ensure(self, codes: Iterable[str], start: date, end: date) -> None:
         for code in codes:
-            logger.info("ensure() placeholder for %s", code)
+            f = self._file(str(code))
+            if f.exists():
+                existing = pd.read_parquet(f)
+                existing.index = pd.to_datetime(existing.index).date
+                if start in existing.index and end in existing.index:
+                    continue
+            prefix = "sh" if code.startswith(("5", "6")) else "sz"
+            try:
+                df = ak.fund_etf_hist_sina(symbol=f"{prefix}{code}")
+            except Exception as e:
+                logger.warning("akshare failed for %s: %s", code, e)
+                continue
+            if df is None or df.empty:
+                continue
+            df["date"] = pd.to_datetime(df["date"]).dt.date
+            df = df[(df["date"] >= start) & (df["date"] <= end)]
+            if df.empty:
+                continue
+            df = df.set_index("date")[["open", "high", "low", "close", "volume"]]
+            multi = df.copy()
+            multi.index = pd.MultiIndex.from_product(
+                [df.index, [str(code)]], names=["date", "code"]
+            )
+            self.save(multi)
