@@ -6,3 +6,6 @@ node_modules/
 
 # Nested git repositories (managed independently)
 ClaudeProjects/senior-car-control-app/
+
+# 2026-06-11: 本项目拆成独立 git 仓库
+ClaudeProjects/量化交易策略/ETF交易策略v2.0.0/ETF操盘看板_beta1.3/
