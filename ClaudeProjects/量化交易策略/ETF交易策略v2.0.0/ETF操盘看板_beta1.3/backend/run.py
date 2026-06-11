@@ -1,5 +1,12 @@
 import logging
 import sys
+import os
+
+os.environ.setdefault("PYTHONIOENCODING", "utf-8")
+if sys.stdout and hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if sys.stderr and hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 logging.basicConfig(
     level=logging.INFO,
@@ -17,5 +24,25 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=8000,
         reload=True,
-        log_config={},
+        log_config={
+            "version": 1,
+            "disable_existing_loggers": False,
+            "formatters": {
+                "default": {
+                    "format": "%(asctime)s [%(name)s] %(levelname)s: %(message)s",
+                    "datefmt": "%H:%M:%S",
+                },
+            },
+            "handlers": {
+                "default": {
+                    "class": "logging.StreamHandler",
+                    "stream": "ext://sys.stdout",
+                    "formatter": "default",
+                },
+            },
+            "root": {
+                "level": "INFO",
+                "handlers": ["default"],
+            },
+        },
     )

@@ -97,7 +97,17 @@ def call_llm_api(prompt: str) -> List[Dict]:
         with httpx.Client(timeout=60) as client:
             resp = client.post(url, headers=headers, json=payload)
             print(f"[LLM] HTTP {resp.status_code}")
-            resp.raise_for_status()
+            if resp.status_code == 429:
+                try:
+                    err = resp.json()
+                    msg = err.get("error", {}).get("message", resp.text)
+                    print(f"[LLM] 限流/配额超限: {msg}")
+                except Exception:
+                    print(f"[LLM] 限流/配额超限")
+                return []
+            if resp.status_code != 200:
+                print(f"[LLM] API 错误: {resp.text[:200]}")
+                return []
             data = resp.json()
             content = data["choices"][0]["message"]["content"]
             print(f"[LLM] 返回内容长度: {len(content)}")
@@ -182,8 +192,8 @@ def get_llm_recommendations(etf_list: List[dict]) -> List[Dict]:
     llm_result = call_llm_api(prompt)
 
     if llm_result and len(llm_result) >= 3:
-        print(f"[LLM] ✅ 使用 AI 推荐（LLM 返回 {len(llm_result)} 条）")
-        logger.info("✅ 使用 AI 推荐（LLM 返回 %d 条）", len(llm_result))
+        print(f"[LLM] [OK] 使用 AI 推荐（LLM 返回 {len(llm_result)} 条）")
+        logger.info("[OK] 使用 AI 推荐（LLM 返回 %d 条）", len(llm_result))
         # 校验code是否在我们的池中
         valid_codes = {e["code"] for e in etf_list}
         filtered = [r for r in llm_result if r.get("code") in valid_codes]
@@ -207,8 +217,8 @@ def get_llm_recommendations(etf_list: List[dict]) -> List[Dict]:
         return filtered[:5]
 
     # 回退到规则推荐
-    print("[LLM] ⚠️ 使用量化兜底推荐（LLM 不可用）")
-    logger.info("⚠️ 使用量化兜底推荐（LLM 不可用）")
+    print("[LLM] [WARN] 使用量化兜底推荐（LLM 不可用）")
+    logger.info("[WARN] 使用量化兜底推荐（LLM 不可用）")
     result = fallback_recommend(etf_list)
     for r in result:
         r["source"] = "fallback"
