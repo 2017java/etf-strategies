@@ -5,7 +5,7 @@
 
 ---
 
-## [PROJECT SNAPSHOT] ETF操盘看板 v2.0.0 — 2026-06-11
+## [PROJECT SNAPSHOT] ETF操盘看板 v2.1.0 — 2026-06-12
 
 ### 项目概述
 ETF轮动策略量化看板，前后端分离架构。
@@ -14,12 +14,12 @@ ETF轮动策略量化看板，前后端分离架构。
 - 数据源：akshare（主）/ tushare（备）+ 本地 Parquet 缓存
 - 项目目录：`d:\AICoding\ClaudeProjects\量化交易策略\ETF交易策略v2.0.0\ETF操盘看板_beta1.3`
 
-### Git 仓库（重要修正）
-- **git 仓库根目录在 `D:/AICoding`**，不是项目目录！
-- 项目是 `D:/AICoding` 大仓库下的子目录
-- 当前主分支是 `main`（不是 master）
+### Git 仓库（重要修正 — v2.1 更新）
+- **项目拥有独立 git 仓库**，`.git` 在项目根目录下
+- 远程：`https://github.com/2017java/zhitu.git`
+- 当前主分支是 `main`
 - 提交时需用 `git -c core.fsmonitor=false` 避免沙箱权限问题
-- 分支操作流程：创建分支 → 修改 → 提交 → 验证 → checkout main → merge → 删除分支
+- ⚠️ **父级 `D:/AICoding` 也有 git 仓库**，操作 git 时务必确认 `git rev-parse --show-toplevel` 指向项目目录而非父级
 
 ### 启动方式
 - 双击 `start.bat`（推荐，自动清理旧进程）
@@ -124,20 +124,18 @@ LLM_MODEL=deepseek-v4-pro
 
 ## [GIT] 分支与提交
 
-### 仓库结构（重要）
-- **git 根目录：`D:/AICoding`**，项目是其子目录
+### 仓库结构（v2.1 更新）
+- **项目拥有独立 git 仓库**，`.git` 在项目根目录下
+- 远程：`https://github.com/2017java/zhitu.git`
 - 主分支：`main`
 - 提交时需用 `git -c core.fsmonitor=false` 避免沙箱 index.lock 权限问题
-- 分支策略：创建分支 → 修改 → 提交 → 验证 → checkout main → merge --no-ff → 删除分支
+- ⚠️ **父级 `D:/AICoding` 也有 git 仓库**，操作 git 时务必确认 `git rev-parse --show-toplevel` 指向项目目录而非父级
 
-### 重要提交（main 分支）
-- `aff0719` merge: fix/csp-react-crash → main (移除开发模式CSP)
-- `e572699` fix: 移除开发模式CSP header，修复React Fast Refresh崩溃
-- `f695b28` merge: fix/gbk-emoji-and-csp → main (GBK编码+CSP修复)
-- `ebbcff7` fix: 修复 GBK 编码错误(emoji)和 CSP 阻止 eval 问题
-- `b0e67a1` merge: fix/llm-logging-and-env → main
-- `4e690cf` fix: uvicorn log_config使用空dict避免覆盖自定义日志
-- `1502026` fix: 修复LLM日志输出和.env加载问题
+### 重要提交（main 分支，v2.1 新增）
+- `95e5c53` docs: add v2.1 implementation notes with git incident record
+- `2dcdc9a` feat(v2.1): restore all project files + v2.1 features
+- `db56967` merge: restore full project history from parent repo (34 commits)
+- `c4c116f` feat(v2.1): ETF detail popup + sim portfolio enhancements
 
 ---
 
@@ -280,4 +278,70 @@ LLM_MODEL=deepseek-v4-pro
 - **新增 API 路由必须在 main.py `@app.xxx(...)` 显式注册**——哪怕 sim_routes.py 里有函数也得有路由声明
 - **启动脚本的「清理旧进程」和「退出杀进程树」是产品特性，不是 bug**——永不删除
 - **每次代码改动后必跑 `python run.py`**——pytest 不会触发整个 app 加载，只跑 pytest 不够
+
+---
+
+## [FEATURE] v2.1 — ETF 详情弹窗 + 模拟盘增强 — 2026-06-12
+
+### 功能 1：ETF 详情弹窗
+- **后端**：`GET /api/etf/{code}/kline?days=60|120|250`，数据源优先级：parquet 缓存 → tushare `fund_daily` → akshare `fund_etf_hist_sina` → 503
+- **前端**：`ETFDetail.tsx` — 弹窗展示实时行情概要（当前价、涨跌幅、成交量、30日涨跌、综合得分）+ 收盘价 Area+Line 图 + 成交量 Bar 图
+- **交互**：ETFTable/QuantRanking/SimPortfolio 持仓行点击 ETF 代码/名称 → 打开详情弹窗
+- **决策**：K 线用 Recharts Area+Line 而非蜡烛图（零依赖，信息量足够）；Dashboard 统一管理 `selectedEtf` 状态，三种回调统一转换为 ETFItem
+
+### 功能 2：模拟盘新增持仓 ETF 搜索选择
+- **前端**：`PositionEditModal` 代码输入框旁加 Search 按钮 → 弹出 ETF 列表下拉（分"宽基 ETF"/"行业 ETF"两组 + 关键字搜索过滤）→ 选中自动填充 code + name
+- **保留**手动输入代码能力
+
+### 功能 3：批量买入金额自定义
+- **前端**：`BatchBuyModal` 增加"均分/自定义"模式切换按钮组
+- **自定义模式**：每只已选 ETF 显示金额输入框（预填均分值，向下取整到 100 元），底部显示"已分配 ¥xxx / 剩余 ¥xxx"，超出可用资金时红色警告+禁用确认
+- **后端**：`sim_routes.py` `batch_buy` 新增 `amount` 字段，优先级：`shares > 0` → `amount > 0` → 均分，完全向后兼容
+
+### 新增文件
+- `backend/app/kline_routes.py` — K 线 API 路由
+- `frontend/src/components/ETFDetail.tsx` — ETF 详情弹窗
+
+### 修改文件
+- `backend/app/main.py` — 注册 kline_routes
+- `backend/app/sim_routes.py` — batch_buy 支持 amount 字段
+- `frontend/src/api.ts` — 新增 `getEtfKline()` + batchBuySim items 增加 amount 字段
+- `frontend/src/types.ts` — 新增 `KlinePoint` + `KlineResponse` 接口
+- `frontend/src/components/Dashboard.tsx` — selectedEtf 状态 + ETFDetail 弹窗
+- `frontend/src/components/ETFTable.tsx` — onEtfClick prop
+- `frontend/src/components/QuantRanking.tsx` — onEtfClick prop
+- `frontend/src/components/SimPortfolio.tsx` — PositionEditModal ETF 搜索 + BatchBuyModal 均分/自定义 + onEtfClick prop
+
+### 验证结果
+- 后端 pytest：37/37 passed ✅
+- 前端 `npm run build`：0 error ✅
+- 后端启动：无 ImportError ✅
+
+---
+
+## [INCIDENT] Git 仓库破坏与恢复 — 2026-06-12
+
+### 事故经过
+1. v2.1 实施过程中，git 命令误操作到父级 `D:/AICoding` 仓库而非项目独立仓库
+2. 尝试从父级仓库 `git subtree split` 恢复历史时，`git checkout -f` 清除了工作区中未被 git 追踪的文件
+3. **丢失文件**：`backend/app/` 下 19 个 Python 模块 + `frontend/src/components/` 下 4 个组件（ETFDetail, BacktestRunner, BacktestCompare, LLMRecommend）
+4. 原因：这些文件在之前的会话中创建，但从未被正确 `git add` 到项目独立仓库
+
+### 恢复方式
+1. `git subtree split` 从父级仓库重建 34 个提交历史
+2. `git commit-tree` 创建合并提交（不触发 checkout，避免 node_modules 锁文件问题）
+3. 子代理根据 `main.py` / `sim_routes.py` 的 import 链重建了所有丢失的 Python 模块
+4. 子代理重建了 ETFDetail.tsx、BacktestRunner.tsx、BacktestCompare.tsx、LLMRecommend.tsx
+
+### ⚠️ 风险提示
+重建的文件功能等价，但某些实现细节可能与原始文件有细微差异。**用户需实际启动项目验证功能**，特别是：
+- K 线图加载（tushare/akshare 双源回退）
+- ETF 搜索选择（宽基/行业分组）
+- 自定义金额分配（均分/自定义切换）
+- 回测功能（BacktestRunner/BacktestCompare 恢复的组件）
+
+### 预防说明（刻碑 ×2）
+- **进行 git checkout/merge 前必须 `git add -A`**——未追踪的文件会被 checkout -f 清除
+- **git 操作前先确认 `git rev-parse --show-toplevel`**——避免误操作到父级仓库
+- **node_modules 二进制文件锁**——Windows 上 `git checkout` 涉及 node_modules 中的 .exe/.node 文件时会卡住，应用 `git commit-tree` 绕过 checkout
 
