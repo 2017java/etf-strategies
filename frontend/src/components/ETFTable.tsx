@@ -105,7 +105,9 @@ export default function ETFTable({ data, onEtfClick }: { data: ETFItem[]; onEtfC
               <th className="px-5 py-3 font-medium text-right cursor-pointer select-none" onClick={() => handleSort('composite_score')}>
                 <span className="inline-flex items-center gap-1">综合得分 <SortIcon target="composite_score" /></span>
               </th>
-              <th className="px-5 py-3 font-medium text-right">成交量</th>
+              <th className="px-5 py-3 font-medium text-right cursor-pointer select-none whitespace-nowrap" onClick={() => handleSort('volume')}>
+                <span className="inline-flex items-center gap-1">成交量 <SortIcon target="volume" /></span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -150,7 +152,7 @@ export default function ETFTable({ data, onEtfClick }: { data: ETFItem[]; onEtfC
                     {item.composite_score > 0 ? '+' : ''}{item.composite_score.toFixed(2)}
                   </span>
                 </td>
-                <td className="px-5 py-3 text-right text-slate-500">{formatVolume(item.volume)}</td>
+                <td className="px-5 py-3 text-right text-slate-500 whitespace-nowrap">{formatVolume(item.volume)}</td>
               </tr>
             ))}
           </tbody>
