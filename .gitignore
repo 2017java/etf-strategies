@@ -1,11 +1,69 @@
-.trae/
-.DS_Store
-Thumbs.db
-*.log
-node_modules/
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
 
-# Nested git repositories (managed independently)
-ClaudeProjects/senior-car-control-app/
+# 测试
+.pytest_cache/
+htmlcov/
+.coverage
 
-# 2026-06-11: 本项目拆成独立 git 仓库
-ClaudeProjects/量化交易策略/ETF交易策略v2.0.0/ETF操盘看板_beta1.3/
+# 虚拟环境
+venv/
+env/
+.venv/
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 运行时数据缓存
+backend/data/ohlcv/*.parquet
+backend/data/backtest_runs/*.json
+!backend/data/ohlcv/.gitkeep
+!backend/data/backtest_runs/.gitkeep
+
+# 前端构建产物和依赖
+frontend/node_modules/
+frontend/dist/
+
+# macOS 压缩包残留
+__MACOSX/
+*.zip
+
+# 调试/验证脚本（非核心代码）
+backend/call_api.py
+backend/check_api.py
+backend/debug_calc.py
+backend/quick_check.py
+backend/quick_verify.py
+backend/verify_*.py
+backend/test_neodata*.py
+backend/test_hot_recommend.py
+backend/verify_*.txt
+backend/etf_verify_error.txt
+backend/startup.log
+backend/backend.log
+backend/backend*.log
+backend/sim_portfolio_data.json
+backend/diag_llm.py
+
+# Playwright CLI 缓存
+.playwright-cli/
+
+# Workbuddy 配置
+.workbuddy/
+
+# 环境变量
+.env
+.env.local
+
+backup_migration_2026-06-11/
+*.bundle
+

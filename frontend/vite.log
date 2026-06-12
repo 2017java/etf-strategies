@@ -1,0 +1,823 @@
+
+> frontend@0.0.0 dev
+> vite --host 0.0.0.0
+
+
+  VITE v5.4.21  ready in 2392 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://192.168.1.6:5173/
+11:48:12 PM [vite] hmr update /src/components/QuantRanking.tsx, /src/index.css
+11:55:34 PM [vite] page reload src/types.ts
+11:55:34 PM [vite] hmr update /src/components/Dashboard.tsx, /src/index.css
+11:31:38 PM [vite] page reload src/types.ts
+11:31:38 PM [vite] hmr update /src/components/Dashboard.tsx, /src/index.css
+11:34:33 PM [vite] hmr update /src/components/Dashboard.tsx, /src/index.css
+11:34:33 PM [vite] page reload src/main.tsx
+11:35:13 PM [vite] Pre-transform error: Failed to resolve import "../api" from "src/DashboardContext.tsx". Does the file exist?
+11:35:13 PM [vite] Pre-transform error: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/components/SimPortfolio.tsx: JSX attributes must only be assigned a non-empty expression. (102:28)
+
+  100 |                 <label
+  101 |                   key={etf.code}
+> 102 |                   className={}
+      |                             ^
+  103 |                 >
+  104 |                   <input
+  105 |                     type="checkbox"
+11:35:13 PM [vite] Pre-transform error: Failed to resolve import "../api" from "src/DashboardContext.tsx". Does the file exist?
+11:40:15 PM [vite] Internal server error: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/components/SimPortfolio.tsx: JSX attributes must only be assigned a non-empty expression. (102:28)
+
+  100 |                 <label
+  101 |                   key={etf.code}
+> 102 |                   className={}
+      |                             ^
+  103 |                 >
+  104 |                   <input
+  105 |                     type="checkbox"
+  Plugin: vite:react-babel
+  File: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/components/SimPortfolio.tsx:102:28
+  100|                  <label
+  101|                    key={etf.code}
+  102|                    className={}
+     |                              ^
+  103|                  >
+  104|                    <input
+      at constructor (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:365:19)
+      at TypeScriptParserMixin.raise (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:6599:19)
+      at TypeScriptParserMixin.jsxParseAttributeValue (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4606:16)
+      at TypeScriptParserMixin.jsxParseAttribute (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4653:38)
+      at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4667:28)
+      at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10043:18)
+      at TypeScriptParserMixin.jsxParseOpeningElementAt (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4662:17)
+      at TypeScriptParserMixin.jsxParseElementAt (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4686:33)
+      at TypeScriptParserMixin.jsxParseElement (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4749:17)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4759:19)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9837:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10831:21)
+      at /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9775:39
+      at TypeScriptParserMixin.tryParse (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:6907:20)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9775:18)
+      at /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10800:39
+      at TypeScriptParserMixin.allowInAnd (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12426:12)
+      at TypeScriptParserMixin.parseMaybeAssignAllowIn (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10800:17)
+      at TypeScriptParserMixin.parseMaybeAssignAllowInOrVoidPattern (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12493:17)
+      at TypeScriptParserMixin.parseParenAndDistinguishExpression (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11675:28)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11331:23)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9837:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10831:21)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9786:20)
+      at TypeScriptParserMixin.parseFunctionBody (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12093:24)
+      at TypeScriptParserMixin.parseArrowExpression (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12075:10)
+      at TypeScriptParserMixin.parseParenAndDistinguishExpression (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11687:12)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11331:23)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9837:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10831:21)
+11:40:15 PM [vite] Internal server error: Failed to resolve import "../api" from "src/DashboardContext.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/DashboardContext.tsx:3:47
+  17 |  var _s = $RefreshSig$(), _s2 = $RefreshSig$();
+  18 |  import { createContext, useContext, useState, useCallback, useEffect } from "react";
+  19 |  import { refreshDashboard, getDashboard } from "../api";
+     |                                                  ^
+  20 |  const DashboardContext = createContext({
+  21 |    data: null,
+      at TransformPluginContext._formatError (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 4)
+      at async TransformPluginContext.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+11:40:15 PM [vite] Internal server error: Failed to resolve import "../api" from "src/DashboardContext.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/DashboardContext.tsx:3:47
+  17 |  var _s = $RefreshSig$(), _s2 = $RefreshSig$();
+  18 |  import { createContext, useContext, useState, useCallback, useEffect } from "react";
+  19 |  import { refreshDashboard, getDashboard } from "../api";
+     |                                                  ^
+  20 |  const DashboardContext = createContext({
+  21 |    data: null,
+      at TransformPluginContext._formatError (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 4)
+      at async TransformPluginContext.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+11:40:15 PM [vite] Internal server error: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/components/SimPortfolio.tsx: JSX attributes must only be assigned a non-empty expression. (102:28)
+
+  100 |                 <label
+  101 |                   key={etf.code}
+> 102 |                   className={}
+      |                             ^
+  103 |                 >
+  104 |                   <input
+  105 |                     type="checkbox"
+  Plugin: vite:react-babel
+  File: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/components/SimPortfolio.tsx:102:28
+  100|                  <label
+  101|                    key={etf.code}
+  102|                    className={}
+     |                              ^
+  103|                  >
+  104|                    <input
+      at constructor (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:365:19)
+      at TypeScriptParserMixin.raise (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:6599:19)
+      at TypeScriptParserMixin.jsxParseAttributeValue (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4606:16)
+      at TypeScriptParserMixin.jsxParseAttribute (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4653:38)
+      at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4667:28)
+      at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10043:18)
+      at TypeScriptParserMixin.jsxParseOpeningElementAt (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4662:17)
+      at TypeScriptParserMixin.jsxParseElementAt (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4686:33)
+      at TypeScriptParserMixin.jsxParseElement (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4749:17)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4759:19)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9837:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10831:21)
+      at /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9775:39
+      at TypeScriptParserMixin.tryParse (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:6907:20)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9775:18)
+      at /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10800:39
+      at TypeScriptParserMixin.allowInAnd (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12426:12)
+      at TypeScriptParserMixin.parseMaybeAssignAllowIn (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10800:17)
+      at TypeScriptParserMixin.parseMaybeAssignAllowInOrVoidPattern (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12493:17)
+      at TypeScriptParserMixin.parseParenAndDistinguishExpression (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11675:28)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11331:23)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9837:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10831:21)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9786:20)
+      at TypeScriptParserMixin.parseFunctionBody (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12093:24)
+      at TypeScriptParserMixin.parseArrowExpression (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12075:10)
+      at TypeScriptParserMixin.parseParenAndDistinguishExpression (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11687:12)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11331:23)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9837:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10831:21)
+11:40:22 PM [vite] Internal server error: Failed to resolve import "../api" from "src/DashboardContext.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/DashboardContext.tsx:3:47
+  17 |  var _s = $RefreshSig$(), _s2 = $RefreshSig$();
+  18 |  import { createContext, useContext, useState, useCallback, useEffect } from "react";
+  19 |  import { refreshDashboard, getDashboard } from "../api";
+     |                                                  ^
+  20 |  const DashboardContext = createContext({
+  21 |    data: null,
+      at TransformPluginContext._formatError (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 4)
+      at async TransformPluginContext.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+11:40:22 PM [vite] Internal server error: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/components/SimPortfolio.tsx: JSX attributes must only be assigned a non-empty expression. (102:28)
+
+  100 |                 <label
+  101 |                   key={etf.code}
+> 102 |                   className={}
+      |                             ^
+  103 |                 >
+  104 |                   <input
+  105 |                     type="checkbox"
+  Plugin: vite:react-babel
+  File: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/components/SimPortfolio.tsx:102:28
+  100|                  <label
+  101|                    key={etf.code}
+  102|                    className={}
+     |                              ^
+  103|                  >
+  104|                    <input
+      at constructor (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:365:19)
+      at TypeScriptParserMixin.raise (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:6599:19)
+      at TypeScriptParserMixin.jsxParseAttributeValue (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4606:16)
+      at TypeScriptParserMixin.jsxParseAttribute (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4653:38)
+      at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4667:28)
+      at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10043:18)
+      at TypeScriptParserMixin.jsxParseOpeningElementAt (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4662:17)
+      at TypeScriptParserMixin.jsxParseElementAt (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4686:33)
+      at TypeScriptParserMixin.jsxParseElement (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4749:17)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4759:19)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9837:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10831:21)
+      at /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9775:39
+      at TypeScriptParserMixin.tryParse (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:6907:20)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9775:18)
+      at /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10800:39
+      at TypeScriptParserMixin.allowInAnd (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12426:12)
+      at TypeScriptParserMixin.parseMaybeAssignAllowIn (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10800:17)
+      at TypeScriptParserMixin.parseMaybeAssignAllowInOrVoidPattern (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12493:17)
+      at TypeScriptParserMixin.parseParenAndDistinguishExpression (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11675:28)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11331:23)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9837:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10831:21)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9786:20)
+      at TypeScriptParserMixin.parseFunctionBody (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12093:24)
+      at TypeScriptParserMixin.parseArrowExpression (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12075:10)
+      at TypeScriptParserMixin.parseParenAndDistinguishExpression (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11687:12)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11331:23)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9837:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10831:21)
+11:40:44 PM [vite] Internal server error: Failed to resolve import "../api" from "src/DashboardContext.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/DashboardContext.tsx:3:47
+  17 |  var _s = $RefreshSig$(), _s2 = $RefreshSig$();
+  18 |  import { createContext, useContext, useState, useCallback, useEffect } from "react";
+  19 |  import { refreshDashboard, getDashboard } from "../api";
+     |                                                  ^
+  20 |  const DashboardContext = createContext({
+  21 |    data: null,
+      at TransformPluginContext._formatError (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 4)
+      at async TransformPluginContext.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+11:40:44 PM [vite] Internal server error: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/components/SimPortfolio.tsx: JSX attributes must only be assigned a non-empty expression. (102:28)
+
+  100 |                 <label
+  101 |                   key={etf.code}
+> 102 |                   className={}
+      |                             ^
+  103 |                 >
+  104 |                   <input
+  105 |                     type="checkbox"
+  Plugin: vite:react-babel
+  File: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/components/SimPortfolio.tsx:102:28
+  100|                  <label
+  101|                    key={etf.code}
+  102|                    className={}
+     |                              ^
+  103|                  >
+  104|                    <input
+      at constructor (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:365:19)
+      at TypeScriptParserMixin.raise (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:6599:19)
+      at TypeScriptParserMixin.jsxParseAttributeValue (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4606:16)
+      at TypeScriptParserMixin.jsxParseAttribute (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4653:38)
+      at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4667:28)
+      at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10043:18)
+      at TypeScriptParserMixin.jsxParseOpeningElementAt (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4662:17)
+      at TypeScriptParserMixin.jsxParseElementAt (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4686:33)
+      at TypeScriptParserMixin.jsxParseElement (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4749:17)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4759:19)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9837:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10831:21)
+      at /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9775:39
+      at TypeScriptParserMixin.tryParse (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:6907:20)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9775:18)
+      at /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10800:39
+      at TypeScriptParserMixin.allowInAnd (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12426:12)
+      at TypeScriptParserMixin.parseMaybeAssignAllowIn (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10800:17)
+      at TypeScriptParserMixin.parseMaybeAssignAllowInOrVoidPattern (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12493:17)
+      at TypeScriptParserMixin.parseParenAndDistinguishExpression (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11675:28)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11331:23)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9837:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10831:21)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9786:20)
+      at TypeScriptParserMixin.parseFunctionBody (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12093:24)
+      at TypeScriptParserMixin.parseArrowExpression (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12075:10)
+      at TypeScriptParserMixin.parseParenAndDistinguishExpression (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11687:12)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11331:23)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9837:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10831:21)
+11:40:45 PM [vite] Internal server error: Failed to resolve import "../api" from "src/DashboardContext.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/DashboardContext.tsx:3:47
+  17 |  var _s = $RefreshSig$(), _s2 = $RefreshSig$();
+  18 |  import { createContext, useContext, useState, useCallback, useEffect } from "react";
+  19 |  import { refreshDashboard, getDashboard } from "../api";
+     |                                                  ^
+  20 |  const DashboardContext = createContext({
+  21 |    data: null,
+      at TransformPluginContext._formatError (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 4)
+      at async TransformPluginContext.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+11:40:45 PM [vite] Internal server error: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/components/SimPortfolio.tsx: JSX attributes must only be assigned a non-empty expression. (102:28)
+
+  100 |                 <label
+  101 |                   key={etf.code}
+> 102 |                   className={}
+      |                             ^
+  103 |                 >
+  104 |                   <input
+  105 |                     type="checkbox"
+  Plugin: vite:react-babel
+  File: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/components/SimPortfolio.tsx:102:28
+  100|                  <label
+  101|                    key={etf.code}
+  102|                    className={}
+     |                              ^
+  103|                  >
+  104|                    <input
+      at constructor (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:365:19)
+      at TypeScriptParserMixin.raise (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:6599:19)
+      at TypeScriptParserMixin.jsxParseAttributeValue (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4606:16)
+      at TypeScriptParserMixin.jsxParseAttribute (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4653:38)
+      at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4667:28)
+      at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10043:18)
+      at TypeScriptParserMixin.jsxParseOpeningElementAt (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4662:17)
+      at TypeScriptParserMixin.jsxParseElementAt (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4686:33)
+      at TypeScriptParserMixin.jsxParseElement (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4749:17)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4759:19)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9837:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10831:21)
+      at /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9775:39
+      at TypeScriptParserMixin.tryParse (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:6907:20)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9775:18)
+      at /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10800:39
+      at TypeScriptParserMixin.allowInAnd (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12426:12)
+      at TypeScriptParserMixin.parseMaybeAssignAllowIn (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10800:17)
+      at TypeScriptParserMixin.parseMaybeAssignAllowInOrVoidPattern (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12493:17)
+      at TypeScriptParserMixin.parseParenAndDistinguishExpression (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11675:28)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11331:23)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9837:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10831:21)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9786:20)
+      at TypeScriptParserMixin.parseFunctionBody (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12093:24)
+      at TypeScriptParserMixin.parseArrowExpression (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12075:10)
+      at TypeScriptParserMixin.parseParenAndDistinguishExpression (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11687:12)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11331:23)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9837:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10831:21)
+11:41:06 PM [vite] Internal server error: Failed to resolve import "../api" from "src/DashboardContext.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/DashboardContext.tsx:3:47
+  17 |  var _s = $RefreshSig$(), _s2 = $RefreshSig$();
+  18 |  import { createContext, useContext, useState, useCallback, useEffect } from "react";
+  19 |  import { refreshDashboard, getDashboard } from "../api";
+     |                                                  ^
+  20 |  const DashboardContext = createContext({
+  21 |    data: null,
+      at TransformPluginContext._formatError (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 4)
+      at async TransformPluginContext.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+11:41:06 PM [vite] Internal server error: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/components/SimPortfolio.tsx: JSX attributes must only be assigned a non-empty expression. (102:28)
+
+  100 |                 <label
+  101 |                   key={etf.code}
+> 102 |                   className={}
+      |                             ^
+  103 |                 >
+  104 |                   <input
+  105 |                     type="checkbox"
+  Plugin: vite:react-babel
+  File: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/components/SimPortfolio.tsx:102:28
+  100|                  <label
+  101|                    key={etf.code}
+  102|                    className={}
+     |                              ^
+  103|                  >
+  104|                    <input
+      at constructor (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:365:19)
+      at TypeScriptParserMixin.raise (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:6599:19)
+      at TypeScriptParserMixin.jsxParseAttributeValue (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4606:16)
+      at TypeScriptParserMixin.jsxParseAttribute (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4653:38)
+      at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4667:28)
+      at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10043:18)
+      at TypeScriptParserMixin.jsxParseOpeningElementAt (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4662:17)
+      at TypeScriptParserMixin.jsxParseElementAt (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4686:33)
+      at TypeScriptParserMixin.jsxParseElement (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4749:17)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4759:19)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9837:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10831:21)
+      at /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9775:39
+      at TypeScriptParserMixin.tryParse (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:6907:20)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9775:18)
+      at /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10800:39
+      at TypeScriptParserMixin.allowInAnd (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12426:12)
+      at TypeScriptParserMixin.parseMaybeAssignAllowIn (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10800:17)
+      at TypeScriptParserMixin.parseMaybeAssignAllowInOrVoidPattern (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12493:17)
+      at TypeScriptParserMixin.parseParenAndDistinguishExpression (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11675:28)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11331:23)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9837:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10831:21)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9786:20)
+      at TypeScriptParserMixin.parseFunctionBody (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12093:24)
+      at TypeScriptParserMixin.parseArrowExpression (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12075:10)
+      at TypeScriptParserMixin.parseParenAndDistinguishExpression (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11687:12)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11331:23)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9837:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10831:21)
+11:41:06 PM [vite] Internal server error: Failed to resolve import "../api" from "src/DashboardContext.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/DashboardContext.tsx:3:47
+  17 |  var _s = $RefreshSig$(), _s2 = $RefreshSig$();
+  18 |  import { createContext, useContext, useState, useCallback, useEffect } from "react";
+  19 |  import { refreshDashboard, getDashboard } from "../api";
+     |                                                  ^
+  20 |  const DashboardContext = createContext({
+  21 |    data: null,
+      at TransformPluginContext._formatError (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 4)
+      at async TransformPluginContext.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+11:41:06 PM [vite] Internal server error: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/components/SimPortfolio.tsx: JSX attributes must only be assigned a non-empty expression. (102:28)
+
+  100 |                 <label
+  101 |                   key={etf.code}
+> 102 |                   className={}
+      |                             ^
+  103 |                 >
+  104 |                   <input
+  105 |                     type="checkbox"
+  Plugin: vite:react-babel
+  File: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/components/SimPortfolio.tsx:102:28
+  100|                  <label
+  101|                    key={etf.code}
+  102|                    className={}
+     |                              ^
+  103|                  >
+  104|                    <input
+      at constructor (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:365:19)
+      at TypeScriptParserMixin.raise (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:6599:19)
+      at TypeScriptParserMixin.jsxParseAttributeValue (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4606:16)
+      at TypeScriptParserMixin.jsxParseAttribute (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4653:38)
+      at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4667:28)
+      at TypeScriptParserMixin.jsxParseOpeningElementAfterName (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10043:18)
+      at TypeScriptParserMixin.jsxParseOpeningElementAt (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4662:17)
+      at TypeScriptParserMixin.jsxParseElementAt (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4686:33)
+      at TypeScriptParserMixin.jsxParseElement (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4749:17)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4759:19)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9837:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10831:21)
+      at /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9775:39
+      at TypeScriptParserMixin.tryParse (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:6907:20)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9775:18)
+      at /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10800:39
+      at TypeScriptParserMixin.allowInAnd (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12426:12)
+      at TypeScriptParserMixin.parseMaybeAssignAllowIn (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10800:17)
+      at TypeScriptParserMixin.parseMaybeAssignAllowInOrVoidPattern (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12493:17)
+      at TypeScriptParserMixin.parseParenAndDistinguishExpression (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11675:28)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11331:23)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9837:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10831:21)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9786:20)
+      at TypeScriptParserMixin.parseFunctionBody (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12093:24)
+      at TypeScriptParserMixin.parseArrowExpression (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:12075:10)
+      at TypeScriptParserMixin.parseParenAndDistinguishExpression (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11687:12)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11331:23)
+      at TypeScriptParserMixin.parseExprAtom (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at TypeScriptParserMixin.parseExprSubscripts (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11081:23)
+      at TypeScriptParserMixin.parseUpdate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11066:21)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:11046:23)
+      at TypeScriptParserMixin.parseMaybeUnary (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:9837:18)
+      at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10899:61)
+      at TypeScriptParserMixin.parseExprOps (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10904:23)
+      at TypeScriptParserMixin.parseMaybeConditional (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10881:23)
+      at TypeScriptParserMixin.parseMaybeAssign (/Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/node_modules/@babel/parser/lib/index.js:10831:21)
+11:47:32 PM [vite] hmr update /src/index.css, /src/components/Dashboard.tsx
+11:47:32 PM [vite] Pre-transform error: Failed to resolve import "../api" from "src/DashboardContext.tsx". Does the file exist?
+11:47:32 PM [vite] Pre-transform error: Failed to resolve import "../api" from "src/DashboardContext.tsx". Does the file exist?
+11:47:32 PM [vite] Pre-transform error: Failed to resolve import "../api" from "src/DashboardContext.tsx". Does the file exist?
+11:47:32 PM [vite] Internal server error: Failed to resolve import "../api" from "src/DashboardContext.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/DashboardContext.tsx:3:47
+  17 |  var _s = $RefreshSig$(), _s2 = $RefreshSig$();
+  18 |  import { createContext, useContext, useState, useCallback, useEffect } from "react";
+  19 |  import { refreshDashboard, getDashboard } from "../api";
+     |                                                  ^
+  20 |  const DashboardContext = createContext({
+  21 |    data: null,
+      at TransformPluginContext._formatError (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 4)
+      at async TransformPluginContext.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+11:48:00 PM [vite] Internal server error: Failed to resolve import "../api" from "src/DashboardContext.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/DashboardContext.tsx:3:47
+  17 |  var _s = $RefreshSig$(), _s2 = $RefreshSig$();
+  18 |  import { createContext, useContext, useState, useCallback, useEffect } from "react";
+  19 |  import { refreshDashboard, getDashboard } from "../api";
+     |                                                  ^
+  20 |  const DashboardContext = createContext({
+  21 |    data: null,
+      at TransformPluginContext._formatError (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 4)
+      at async TransformPluginContext.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+11:48:02 PM [vite] Internal server error: Failed to resolve import "../api" from "src/DashboardContext.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/DashboardContext.tsx:3:47
+  17 |  var _s = $RefreshSig$(), _s2 = $RefreshSig$();
+  18 |  import { createContext, useContext, useState, useCallback, useEffect } from "react";
+  19 |  import { refreshDashboard, getDashboard } from "../api";
+     |                                                  ^
+  20 |  const DashboardContext = createContext({
+  21 |    data: null,
+      at TransformPluginContext._formatError (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 4)
+      at async TransformPluginContext.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+Vim: Warning: Output is not to a terminal
+Vim: Warning: Input is not from a terminal
+[m[m[0m[H[2J[24;1H<型/etf trading strategy_beta1.2/frontend/src/DashboardContext.tsx"<ding strategy_beta1.2/frontend/src/DashboardContext.tsx" 53L, 1462B[1;1Himport { createContext, useContext, useState, useCallback, useEffect, ReactNode  [2;1H} from "react";
+import type { DashboardData } from "../types";
+import { refreshDashboard, getDashboard } from "../api";
+
+interface DashboardContextValue {
+  data: DashboardData | null;
+  loading: boolean;
+  error: string;
+  load: (force?: boolean) => Promise<void>;
+}
+
+const DashboardContext = createContext<DashboardContextValue>({
+  data: null,
+  loading: false,
+  error: "",
+  load: async () => {},
+});
+
+export function DashboardProvider({ children }: { children: ReactNode }) {
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");[1;1H[24;1HVim: Error reading input, exiting...
+Vim: Finished.
+[24;1H
+
+Could not open DashboardContext.tsx in the editor.
+The editor process exited with an error: (code 1).
+
+11:48:09 PM [vite] Internal server error: Failed to resolve import "../api" from "src/DashboardContext.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/DashboardContext.tsx:3:47
+  17 |  var _s = $RefreshSig$(), _s2 = $RefreshSig$();
+  18 |  import { createContext, useContext, useState, useCallback, useEffect } from "react";
+  19 |  import { refreshDashboard, getDashboard } from "../api";
+     |                                                  ^
+  20 |  const DashboardContext = createContext({
+  21 |    data: null,
+      at TransformPluginContext._formatError (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 4)
+      at async TransformPluginContext.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+11:48:18 PM [vite] Internal server error: Failed to resolve import "../api" from "src/DashboardContext.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/DashboardContext.tsx:3:47
+  17 |  var _s = $RefreshSig$(), _s2 = $RefreshSig$();
+  18 |  import { createContext, useContext, useState, useCallback, useEffect } from "react";
+  19 |  import { refreshDashboard, getDashboard } from "../api";
+     |                                                  ^
+  20 |  const DashboardContext = createContext({
+  21 |    data: null,
+      at TransformPluginContext._formatError (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 4)
+      at async TransformPluginContext.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+11:48:18 PM [vite] Internal server error: Failed to resolve import "../api" from "src/DashboardContext.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/DashboardContext.tsx:3:47
+  17 |  var _s = $RefreshSig$(), _s2 = $RefreshSig$();
+  18 |  import { createContext, useContext, useState, useCallback, useEffect } from "react";
+  19 |  import { refreshDashboard, getDashboard } from "../api";
+     |                                                  ^
+  20 |  const DashboardContext = createContext({
+  21 |    data: null,
+      at TransformPluginContext._formatError (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 4)
+      at async TransformPluginContext.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+11:49:05 PM [vite] page reload src/DashboardContext.tsx
+11:49:13 PM [vite] hmr update /src/DashboardContext.tsx, /src/index.css
+11:49:13 PM [vite] hmr invalidate /src/DashboardContext.tsx Could not Fast Refresh ("useDashboard" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+11:49:13 PM [vite] page reload src/DashboardContext.tsx
+11:49:23 PM [vite] hmr update /src/components/Dashboard.tsx, /src/index.css
+11:49:23 PM [vite] hmr update /src/components/SimPortfolio.tsx, /src/index.css
+11:49:23 PM [vite] Internal server error: Failed to resolve import "./DashboardContext" from "src/components/Dashboard.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/components/Dashboard.tsx:2:29
+  17 |  var _s = $RefreshSig$();
+  18 |  import { useState } from "react";
+  19 |  import { useDashboard } from "./DashboardContext";
+     |                                ^
+  20 |  import ETFTable from "./ETFTable";
+  21 |  import QuantRanking from "./QuantRanking";
+      at TransformPluginContext._formatError (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 4)
+      at async TransformPluginContext.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+11:49:23 PM [vite] Internal server error: Failed to resolve import "./DashboardContext" from "src/components/SimPortfolio.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/smip/Desktop/投资资料/etf 轮动量化模型/etf trading strategy_beta1.2/frontend/src/components/SimPortfolio.tsx:2:29
+  17 |  var _s = $RefreshSig$(), _s2 = $RefreshSig$(), _s3 = $RefreshSig$(), _s4 = $RefreshSig$();
+  18 |  import { useState, useEffect, useCallback } from "react";
+  19 |  import { useDashboard } from "./DashboardContext";
+     |                                ^
+  20 |  import {
+  21 |    getSimPortfolio,
+      at TransformPluginContext._formatError (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 4)
+      at async TransformPluginContext.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///Users/smip/Desktop/%E6%8A%95%E8%B5%84%E8%B5%84%E6%96%99/etf%C2%A0%E8%BD%AE%E5%8A%A8%E9%87%8F%E5%8C%96%E6%A8%A1%E5%9E%8B/etf%20trading%20strategy_beta1.2/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+11:49:23 PM [vite] Pre-transform error: Failed to resolve import "./DashboardContext" from "src/components/SimPortfolio.tsx". Does the file exist?
+11:49:48 PM [vite] hmr update /src/index.css, /src/App.tsx
+11:49:48 PM [vite] hmr update /src/App.tsx, /src/index.css
