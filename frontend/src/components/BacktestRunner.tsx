@@ -144,24 +144,24 @@ export default function BacktestRunner() {
                   ))}
                 </select>
               </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1.5 flex items-center gap-1">
+              <label className="block cursor-pointer">
+                <span className="block text-xs font-medium text-slate-500 mb-1.5 flex items-center gap-1">
                   <Calendar size={12} /> 起始日期
-                </label>
+                </span>
                 <input
                   type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
                   className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition"
                 />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1.5 flex items-center gap-1">
+              </label>
+              <label className="block cursor-pointer">
+                <span className="block text-xs font-medium text-slate-500 mb-1.5 flex items-center gap-1">
                   <Calendar size={12} /> 结束日期
-                </label>
+                </span>
                 <input
                   type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
                   className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition"
                 />
-              </div>
+              </label>
               <div>
                 <label className="block text-xs font-medium text-slate-500 mb-1.5">初始资金</label>
                 <input
