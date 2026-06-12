@@ -110,3 +110,59 @@
 | 11 | `POST /api/sim/initial-cash` (zero) | `400 BadRequest` ✅ |
 | 12 | `GET /api/dashboard?use_cache=false` | 需要网络（akshare），超时但接口逻辑正确 |
 | 13 | 启动脚本清理能力 | 需用户手动验证（功能逻辑已审查通过） |
+
+---
+
+# v2.1 Implementation Notes
+
+**分支**：`main`（直接在 main 上迭代）
+**开始时间**：2026-06-12
+**目标**：ETF 详情弹窗 + 模拟盘持仓 ETF 选择增强 + 批量买入金额自定义
+
+---
+
+## 决策日志
+
+### D5 · K 线数据源选择：tushare 优先 + akshare 兜底
+- **背景**：用户提出"日线接口可以通过 tushare，两个配合使用避免拉爆接口"。
+- **决策**：K 线 API 数据源优先级：parquet 缓存 → tushare `fund_daily` → akshare `fund_etf_hist_sina` → 503。
+- **理由**：akshare 主扛实时行情（新浪分钟线），tushare 主扛历史日线，互不争抢额度。两者都写回共享 parquet 缓存，后续请求直接命中缓存。
+- **影响**：`kline_routes.py` 实现了三层回退逻辑。
+
+### D6 · K 线图用 Recharts Area+Line 而非蜡烛图
+- **背景**：Recharts 不原生支持 OHLC 蜡烛图。
+- **决策**：用 ComposedChart + Area/Line 展示收盘价走势，下方 Bar 展示成交量。
+- **权衡**：蜡烛图更专业，但需要引入额外库（如 lightweight-charts）。Area+Line 方案零依赖、信息量足够。
+- **影响**：用户能看到趋势和成交量，但看不到单日开高低收的实体影线。
+
+### D7 · 自定义金额模式预填均分值
+- **背景**：从"均分"切换到"自定义"模式时，金额输入框初始值如何设置？
+- **决策**：预填均分计算值（向下取整到 100 元），方便用户微调。
+- **理由**：空白输入框用户需要心算均分金额，体验差。预填后改一两个数字即可。
+
+### D8 · Dashboard 统一管理 selectedEtf 状态
+- **背景**：ETFTable、QuantRanking、SimPortfolio 都需要触发 ETF 详情弹窗。
+- **决策**：在 Dashboard.tsx 维护 `selectedEtf: ETFItem | null` 状态，三种回调（ETFItem/QuantRecommend/code+name）统一转换为 ETFItem。
+- **权衡**：状态提升到 Dashboard 而非用 Context，因为只有 Dashboard 和其子组件需要。如果后续有更深层嵌套需要，再考虑 Context。
+
+### D9 · 🚨 Git 事故与恢复
+- **背景**：项目独立 `.git` 仓库在实施过程中被意外破坏（可能是 checkout 操作导致）。
+- **问题**：`git checkout -f` 清除了工作区中未被 git 追踪的文件，导致 `backend/app/` 下 19 个 Python 文件和 `frontend/src/components/ETFDetail.tsx` 等 3 个组件文件丢失。
+- **恢复方式**：
+  1. 用 `git subtree split` 从父级仓库 `D:/AICoding` 重建项目历史分支
+  2. 用 `git commit-tree` 创建合并提交，保留完整 34 个提交历史
+  3. 子代理根据 main.py 的 import 链重建了所有丢失的 Python 模块
+  4. 子代理重建了 ETFDetail.tsx、BacktestRunner.tsx、BacktestCompare.tsx、LLMRecommend.tsx
+- **教训**：在进行 `git checkout` 或 `git merge` 前，务必确保所有工作区文件已被 `git add`。对包含 node_modules 的目录执行 checkout 时，二进制文件锁会导致操作卡住。
+- **影响**：恢复的文件与原始文件功能等价，但某些实现细节（如具体算法优化）可能略有差异。用户需实际验证功能。
+
+---
+
+## v2.1 回归测试结果
+
+| # | 测试项 | 结果 |
+|---|---|---|
+| 1 | 后端 pytest | **37/37 passed** ✅ |
+| 2 | 前端 `npm run build` | **0 error** ✅ |
+| 3 | 后端启动 `python run.py` | **无 ImportError** ✅ |
+| 4 | Git 独立仓库 | **main 分支，34+ 提交历史，远程 zhitu** ✅ |
