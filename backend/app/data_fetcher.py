@@ -2,9 +2,19 @@ import akshare as ak
 import pandas as pd
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, time
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 from app.config import ETF_POOL, TRADE_MORNING_START, TRADE_MORNING_END, TRADE_AFTERNOON_START, TRADE_AFTERNOON_END
 from app import progress
+from app.data_store import OHLCVStore
+
+_OHLCV_STORE: Optional[OHLCVStore] = None
+
+def _get_store() -> OHLCVStore:
+    global _OHLCV_STORE
+    if _OHLCV_STORE is None:
+        _OHLCV_STORE = OHLCVStore()
+    return _OHLCV_STORE
 
 # 盘中模式：T-1 / T-2 历史数据缓存（避免重复请求）
 _t1_cache: Dict[str, dict] = {}
@@ -14,26 +24,65 @@ _sina_history_cache: Dict[str, pd.DataFrame] = {}
 
 
 def _fetch_sina_history(code: str, min_rows: int = 35) -> Optional[pd.DataFrame]:
-    """统一入口：拉取 sina 日线历史 K 线（升序 35 行），per-process 缓存避免重复 HTTP。
+    """统一入口：拉取 sina 日线历史 K 线（升序），per-process + parquet 双层缓存。
+
+    缓存层级：
+    1) per-process dict（_sina_history_cache）：避免同进程内同 code 重复 HTTP
+    2) parquet 文件（OHLCVStore）：跨进程持久化，二次启动秒开
 
     返回 DataFrame：columns=[date, open, close, high, low, volume]，按 date 升序。
     返回 None：接口失败 / 数据不足。
     """
     if code in _sina_history_cache:
         return _sina_history_cache[code]
-    try:
-        symbol = f"{get_exchange_prefix(code)}{code}"
-        df = ak.fund_etf_hist_sina(symbol=symbol)
-        if df is None or df.empty:
+
+    # L1: 内存缓存 miss，尝试 L2: parquet 持久化缓存
+    store = _get_store()
+    parquet_file = store.root / f"{code}.parquet"
+    df: Optional[pd.DataFrame] = None
+    if parquet_file.exists():
+        try:
+            cached = pd.read_parquet(parquet_file)
+            if not cached.empty and len(cached) >= min_rows:
+                # 转为升序并确保列齐全
+                cached = cached.reset_index()
+                date_col = "date" if "date" in cached.columns else cached.columns[0]
+                cached = cached.sort_values(date_col, ascending=True).reset_index(drop=True)
+                df = cached
+        except Exception:
+            df = None
+
+    if df is None:
+        # L2 miss：真正调 akshare
+        try:
+            symbol = f"{get_exchange_prefix(code)}{code}"
+            raw = ak.fund_etf_hist_sina(symbol=symbol)
+            if raw is None or raw.empty:
+                return None
+            raw = raw.sort_values("date", ascending=True).reset_index(drop=True)
+            if len(raw) < min_rows:
+                return None
+            df = raw
+            # 落盘到 parquet（异步线程执行，避免阻塞主流程）
+            try:
+                parquet_df = df.copy()
+                parquet_df["date"] = pd.to_datetime(parquet_df["date"]).dt.date
+                parquet_df = parquet_df.set_index("date")[["open", "high", "low", "close", "volume"]]
+                multi = parquet_df.copy()
+                multi.index = pd.MultiIndex.from_product(
+                    [parquet_df.index, [str(code)]], names=["date", "code"]
+                )
+                # 单进程内串行写：避免 data_store.save() 的 read-modify-write 竞态
+                store.save(multi)
+            except Exception:
+                pass  # 落盘失败不影响内存返回
+        except Exception:
             return None
-        # 原始数据 date 倒序，统一转升序方便 iloc[-1] = 最新
-        df = df.sort_values("date", ascending=True).reset_index(drop=True)
-        if len(df) < min_rows:
-            return None
-        _sina_history_cache[code] = df
-        return df
-    except Exception:
+
+    if df is None or len(df) < min_rows:
         return None
+    _sina_history_cache[code] = df
+    return df
 
 
 def should_use_realtime_mode() -> bool:
@@ -361,4 +410,21 @@ def fetch_all_etf_data(max_workers: int = 15) -> Tuple[Dict[str, List[dict]], bo
 
     progress.tick(phase="done")
     progress.finish()
+    _cleanup_ohlcv_cache()
     return result, trading
+
+
+def _cleanup_ohlcv_cache(max_age_days: int = 7) -> None:
+    """清理 ohlcv_cache/ 中超过 max_age_days 天的 parquet 文件，避免磁盘无限增长。"""
+    try:
+        store = _get_store()
+        cutoff = datetime.now() - timedelta(days=max_age_days)
+        for f in store.root.glob("*.parquet"):
+            try:
+                mtime = datetime.fromtimestamp(f.stat().st_mtime)
+                if mtime < cutoff:
+                    f.unlink()
+            except Exception:
+                continue
+    except Exception:
+        pass
