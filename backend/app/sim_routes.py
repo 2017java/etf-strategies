@@ -68,31 +68,40 @@ def update_prices(price_map: dict):   # {code: price}
             pos.updated_at = _now()
     _save(portfolio)
 
-# 批量均仓买入
+# 批量买入（支持均分/自定义金额/固定份额三种模式）
 def batch_buy(items: List[dict]) -> SimPortfolio:
     """
-    items: [{code, name, price, shares}]
-    shares 为 0 时自动均分可用资金
+    items 每项字段：
+      - code, name, price (必填)
+      - shares > 0   → 固定份额模式
+      - amount > 0   → 自定义金额模式（按 amount/price 计算份额，向下取整 100）
+      - shares == 0  && amount == 0  → 均分模式（按可用资金均分到本组）
     """
     portfolio = _load()
     available = portfolio.available_cash()
-    total_cost = 0.0
-    
-    # 计算总份额和每份均分
-    auto_items = [it for it in items if it.get("shares", 0) == 0]
-    fixed_items = [it for it in items if it.get("shares", 0) > 0]
-    
-    # 先计算固定份额总占用
-    fixed_cost = sum(it["shares"] * it["price"] for it in fixed_items)
-    remaining = available - fixed_cost
+
+    # 分桶：固定份额 / 自定义金额 / 均分
+    fixed_share_items = [it for it in items if it.get("shares", 0) > 0]
+    fixed_amount_items = [it for it in items if it.get("shares", 0) == 0 and it.get("amount", 0) > 0]
+    auto_items = [it for it in items if it.get("shares", 0) == 0 and it.get("amount", 0) == 0]
+
+    fixed_share_cost = sum(it["shares"] * it["price"] for it in fixed_share_items)
+    fixed_amount_cost = sum(float(it["amount"]) for it in fixed_amount_items)
+    remaining = available - fixed_share_cost - fixed_amount_cost
     per_share = remaining / len(auto_items) if auto_items else 0
-    
+
     all_items = []
-    for it in fixed_items:
+    for it in fixed_share_items:
         if it.get("price", 0) <= 0:
             _log.warning("batch_buy 跳过非法 price=0 的固定份额项: %s", it.get("code"))
             continue
         all_items.append({**it, "calc_shares": it["shares"]})
+    for it in fixed_amount_items:
+        if it.get("price", 0) <= 0:
+            _log.warning("batch_buy 跳过非法 price=0 的自定义金额项: %s", it.get("code"))
+            continue
+        calc_shares = int(float(it["amount"]) / it["price"] / 100) * 100
+        all_items.append({**it, "calc_shares": calc_shares})
     for it in auto_items:
         if per_share <= 0 or it.get("price", 0) <= 0:
             if it.get("price", 0) <= 0:
@@ -100,7 +109,7 @@ def batch_buy(items: List[dict]) -> SimPortfolio:
             continue
         calc_shares = int(per_share / it["price"] / 100) * 100
         all_items.append({**it, "calc_shares": calc_shares})
-    
+
     new_trades = []
     for it in all_items:
         code = it["code"]
@@ -110,7 +119,7 @@ def batch_buy(items: List[dict]) -> SimPortfolio:
         amount = round(shares * price, 2)
         if shares <= 0 or amount <= 0:
             continue
-        
+
         # 更新或新增持仓
         existing = next((p for p in portfolio.positions if p.code == code), None)
         if existing:
@@ -124,13 +133,12 @@ def batch_buy(items: List[dict]) -> SimPortfolio:
                 code=code, name=name, shares=shares,
                 avg_cost=round(price, 4), current_price=price, updated_at=_now()
             ))
-        
+
         new_trades.append(TradeRecord(
             id=_new_id(), time=_now(), action="buy",
             code=code, name=name, price=price, shares=shares, amount=amount
         ))
-        total_cost += amount
-    
+
     portfolio.trades.extend(new_trades)
     _save(portfolio)
     return portfolio
