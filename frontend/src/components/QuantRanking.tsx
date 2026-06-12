@@ -33,7 +33,7 @@ export default function QuantRanking({ data, onEtfClick }: { data: QuantRecommen
       <div className="flex items-center gap-2 mb-5">
         <Trophy className="text-primary-600" size={22} />
         <h3 className="text-lg font-semibold text-slate-800">量化评分 TOP5</h3>
-        <span className="ml-auto text-xs text-slate-400 bg-slate-50 px-2 py-1 rounded-full">
+        <span className="hidden md:inline ml-auto text-xs text-slate-400 bg-slate-50 px-2 py-1 rounded-full">
          涨跌幅×2 + 两日累计×3 + 成交量放大×0.5 + MA20(+50) + 30日标准分×1
         </span>
       </div>
@@ -97,7 +97,7 @@ export default function QuantRanking({ data, onEtfClick }: { data: QuantRecommen
                   </div>
                 </div>
               </div>
-              <div className="text-right">
+              <div className="text-right flex-shrink-0">
                 <div className={`text-2xl font-bold ${item.composite_score >= 0 ? 'text-rise' : 'text-fall'}`}>
                   {item.composite_score > 0 ? '+' : ''}{item.composite_score.toFixed(2)}
                 </div>
