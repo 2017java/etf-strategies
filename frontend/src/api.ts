@@ -1,6 +1,6 @@
 import type {
   RefreshResponse, DashboardData, SimPortfolio, SimPosition, SimTrade,
-  BacktestResult, StrategyInfo, BenchmarkInfo,
+  BacktestResult, StrategyInfo, BenchmarkInfo, KlineResponse,
 } from './types';
 
 const API_BASE = '/api';
@@ -155,5 +155,11 @@ export async function compareStrategies(params: {
     body: JSON.stringify(params),
   });
   if (!res.ok) throw new Error(`策略对比失败: ${res.status}`);
+  return res.json();
+}
+
+export async function getEtfKline(code: string, days = 120): Promise<KlineResponse> {
+  const res = await fetch(`${API_BASE}/etf/kline?code=${code}&days=${days}`);
+  if (!res.ok) throw new Error(`获取K线失败: ${res.status}`);
   return res.json();
 }

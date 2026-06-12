@@ -151,3 +151,18 @@ export interface BenchmarkInfo {
   code: string;
   name: string;
 }
+
+export interface KlinePoint {
+  date: string;
+  open: number;
+  close: number;
+  high: number;
+  low: number;
+  volume: number;
+}
+
+export interface KlineResponse {
+  code: string;
+  name: string;
+  kline: KlinePoint[];
+}
