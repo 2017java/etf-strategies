@@ -34,7 +34,7 @@ export default function QuantRanking({ data, onEtfClick }: { data: QuantRecommen
         <Trophy className="text-primary-600" size={22} />
         <h3 className="text-lg font-semibold text-slate-800">量化评分 TOP5</h3>
         <span className="hidden md:inline ml-auto text-xs text-slate-400 bg-slate-50 px-2 py-1 rounded-full">
-         涨跌幅×2 + 两日累计×3 + 成交量放大×0.5 + MA20(+50) + 30日标准分×1
+         今日涨跌幅×2 + 两日累计×3 + 成交量放大×0.5 + MA20确认(+50) + 30日标准分×1
         </span>
       </div>
       <div className="space-y-4">
