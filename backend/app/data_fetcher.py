@@ -1,8 +1,10 @@
 import akshare as ak
 import pandas as pd
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, time
 from typing import Dict, List, Optional, Tuple
 from app.config import ETF_POOL, TRADE_MORNING_START, TRADE_MORNING_END, TRADE_AFTERNOON_START, TRADE_AFTERNOON_END
+from app import progress
 
 # 盘中模式：T-1 / T-2 历史数据缓存（避免重复请求）
 _t1_cache: Dict[str, dict] = {}
@@ -257,93 +259,106 @@ def fetch_30d_change(code: str) -> Optional[float]:
     return None
 
 
-def fetch_all_etf_data() -> Tuple[Dict[str, List[dict]], bool]:
+def _fetch_one_etf(category: str, etf: dict, trading: bool) -> Optional[dict]:
+    """拉取单只 ETF 的全部数据；返回 dict 或 None（失败跳过）。
+    进度回调：每完成一只 tick 一次，phase 标记当前阶段。
     """
-    获取全部ETF的近期数据
+    code = etf["code"]
+    name = etf["name"]
+    progress.tick(phase="fetching")
+
+    if trading:
+        rt_data = fetch_realtime_minute(code)
+        if rt_data is None:
+            return None
+        t1_data, t2_data = _get_t1_t2_history(code)
+        item = {
+            "code": code,
+            "name": name,
+            "category": category,
+            "current_price": rt_data["current_price"],
+            "today_volume": rt_data["today_volume"],
+            "current_change_pct": rt_data["current_change_pct"],
+            "data_date": rt_data["data_date"],
+            "data_type": rt_data["data_type"],
+            "yesterday_close": rt_data["yesterday_close"],
+        }
+        if t2_data:
+            item["t2_close"] = t2_data.get("close", rt_data["current_price"])
+            item["t2_volume"] = t2_data.get("volume", rt_data["today_volume"])
+        if t1_data:
+            item["t1_volume"] = t1_data.get("volume", rt_data["today_volume"])
+        ma20 = fetch_ma20(code)
+        if ma20 is not None:
+            item["ma20"] = ma20
+        change_30d = fetch_30d_change(code)
+        if change_30d is not None:
+            item["change_30d"] = change_30d
+        return item
+    else:
+        hist = fetch_history_close(code, n=5)
+        if hist is None or len(hist) < 3:
+            return None
+        t0 = hist[0]
+        t1 = hist[1]
+        t2 = hist[2]
+        current_price = t0["close"]
+        yesterday_close = t1["close"]
+        current_change_pct = round((current_price - yesterday_close) / yesterday_close * 100, 2)
+        today_volume = t0["volume"]
+        return {
+            "code": code,
+            "name": name,
+            "category": category,
+            "current_price": current_price,
+            "today_volume": today_volume,
+            "current_change_pct": current_change_pct,
+            "data_date": t0["date"],
+            "data_type": "closed",
+            "yesterday_close": yesterday_close,
+            "t0_close": t0["close"],
+            "t1_close": t1["close"],
+            "t2_close": t2["close"],
+            "t0_volume": t0["volume"],
+            "t1_volume": t1["volume"],
+            "t2_volume": t2["volume"],
+            "ma20": fetch_ma20(code),
+            "change_30d": fetch_30d_change(code),
+        }
+
+
+def fetch_all_etf_data(max_workers: int = 15) -> Tuple[Dict[str, List[dict]], bool]:
+    """
+    获取全部ETF的近期数据（并发拉取）
     交易时段：盘中实时分钟线数据 + 昨收对比
     非交易时段：历史日线收盘数据
     返回: (category_data_dict, is_trading_time)
     """
     trading = should_use_realtime_mode()
 
-    result = {}
-    for category, etfs in ETF_POOL.items():
-        category_data = []
-        for etf in etfs:
-            code = etf["code"]
-            name = etf["name"]
+    # 进度初始化：扁平化 ETF 池
+    all_etfs = [(cat, etf) for cat, etfs in ETF_POOL.items() for etf in etfs]
+    total = len(all_etfs)
+    progress.reset(total=total)
+    progress.tick(phase="starting")
 
-            if trading:
-                # 盘中：实时分钟线
-                rt_data = fetch_realtime_minute(code)
-                if rt_data is None:
-                    continue
-                # 获取T-1、T-2历史数据（供calculator计算两日涨幅和成交量放大）
-                t1_data, t2_data = _get_t1_t2_history(code)
-                item = {
-                    "code": code,
-                    "name": name,
-                    "category": category,
-                    "current_price": rt_data["current_price"],
-                    "today_volume": rt_data["today_volume"],
-                    "current_change_pct": rt_data["current_change_pct"],
-                    "data_date": rt_data["data_date"],
-                    "data_type": rt_data["data_type"],
-                    "yesterday_close": rt_data["yesterday_close"],
-                }
-                if t2_data:
-                    item["t2_close"] = t2_data.get("close", rt_data["current_price"])
-                    item["t2_volume"] = t2_data.get("volume", rt_data["today_volume"])
-                if t1_data:
-                    item["t1_volume"] = t1_data.get("volume", rt_data["today_volume"])
-                # 获取20日均价
-                ma20 = fetch_ma20(code)
-                if ma20 is not None:
-                    item["ma20"] = ma20
-                # 获取30日涨跌幅
-                change_30d = fetch_30d_change(code)
-                if change_30d is not None:
-                    item["change_30d"] = change_30d
-                category_data.append(item)
-            else:
-                # 非交易时段：历史日线
-                hist = fetch_history_close(code, n=5)
-                if hist is None or len(hist) < 3:
-                    continue
-                # hist[0] = T日(今日/最近交易日), hist[1] = T-1, hist[2] = T-2
-                t0 = hist[0]   # 今日收盘（或最近交易日收盘）
-                t1 = hist[1]  # T-1
-                t2 = hist[2]  # T-2
+    result: Dict[str, List[dict]] = {cat: [] for cat in ETF_POOL}
 
-                current_price = t0["close"]
-                yesterday_close = t1["close"]
-                t_minus_3_close = t2["close"]
+    def _task(cat_etf):
+        cat, etf = cat_etf
+        item = _fetch_one_etf(cat, etf, trading)
+        return cat, item
 
-                # 当前涨跌幅（相对昨收）
-                current_change_pct = round((current_price - yesterday_close) / yesterday_close * 100, 2)
-                # 今日成交量
-                today_volume = t0["volume"]
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = [executor.submit(_task, pair) for pair in all_etfs]
+        for fut in as_completed(futures):
+            try:
+                cat, item = fut.result()
+                if item is not None:
+                    result[cat].append(item)
+            except Exception:
+                pass
 
-                category_data.append({
-                    "code": code,
-                    "name": name,
-                    "category": category,
-                    "current_price": current_price,
-                    "today_volume": today_volume,
-                    "current_change_pct": current_change_pct,
-                    "data_date": t0["date"],
-                    "data_type": "closed",     # 收盘数据
-                    "yesterday_close": yesterday_close,
-                    "t0_close": t0["close"],
-                    "t1_close": t1["close"],
-                    "t2_close": t2["close"],
-                    "t0_volume": t0["volume"],
-                    "t1_volume": t1["volume"],
-                    "t2_volume": t2["volume"],
-                    "ma20": fetch_ma20(code),
-                    "change_30d": fetch_30d_change(code),
-                })
-
-        result[category] = category_data
-
+    progress.tick(phase="done")
+    progress.finish()
     return result, trading

@@ -163,3 +163,20 @@ export async function getEtfKline(code: string, days = 120): Promise<KlineRespon
   if (!res.ok) throw new Error(`获取K线失败: ${res.status}`);
   return res.json();
 }
+
+
+// ── 数据加载进度 ────────────────────────────────────────────
+export interface DashboardProgress {
+  done: number;
+  total: number;
+  phase: 'idle' | 'init' | 'starting' | 'fetching' | 'done' | string;
+  started_at: number | null;
+  finished_at: number | null;
+  elapsed_sec: number;
+}
+
+export async function getDashboardProgress(): Promise<DashboardProgress> {
+  const res = await fetch(`${API_BASE}/dashboard/progress`);
+  if (!res.ok) throw new Error(`获取进度失败: ${res.status}`);
+  return res.json();
+}

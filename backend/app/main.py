@@ -103,6 +103,12 @@ def get_dashboard(use_cache: bool = True):
     return refresh_data()
 
 
+@app.get("/api/dashboard/progress")
+def get_dashboard_progress():
+    """返回当前后台数据加载的实时进度（供前端轮询）"""
+    return progress.snapshot()
+
+
 # ── 模拟盘接口 ────────────────────────────────────────────
 
 @app.get("/api/sim/portfolio")

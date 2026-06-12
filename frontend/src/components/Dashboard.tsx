@@ -112,6 +112,8 @@ export default function Dashboard() {
           <div className="rounded-xl bg-rose-50 border border-rose-100 text-rose-700 px-4 py-3 text-sm">{error}</div>
         )}
 
+        <ProgressBar />
+
         {/* 行情看板页面 */}
         {activeTab === "market" && (
           <>
