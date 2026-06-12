@@ -7,6 +7,31 @@ from app.config import ETF_POOL, TRADE_MORNING_START, TRADE_MORNING_END, TRADE_A
 # 盘中模式：T-1 / T-2 历史数据缓存（避免重复请求）
 _t1_cache: Dict[str, dict] = {}
 _t2_cache: Dict[str, dict] = {}
+# 统一 sina 历史 K 线缓存（per-process, 避免同一 code 多次 HTTP）
+_sina_history_cache: Dict[str, pd.DataFrame] = {}
+
+
+def _fetch_sina_history(code: str, min_rows: int = 35) -> Optional[pd.DataFrame]:
+    """统一入口：拉取 sina 日线历史 K 线（升序 35 行），per-process 缓存避免重复 HTTP。
+
+    返回 DataFrame：columns=[date, open, close, high, low, volume]，按 date 升序。
+    返回 None：接口失败 / 数据不足。
+    """
+    if code in _sina_history_cache:
+        return _sina_history_cache[code]
+    try:
+        symbol = f"{get_exchange_prefix(code)}{code}"
+        df = ak.fund_etf_hist_sina(symbol=symbol)
+        if df is None or df.empty:
+            return None
+        # 原始数据 date 倒序，统一转升序方便 iloc[-1] = 最新
+        df = df.sort_values("date", ascending=True).reset_index(drop=True)
+        if len(df) < min_rows:
+            return None
+        _sina_history_cache[code] = df
+        return df
+    except Exception:
+        return None
 
 
 def should_use_realtime_mode() -> bool:
@@ -111,50 +136,38 @@ def _get_t1_t2_history(code: str) -> Tuple[Optional[dict], Optional[dict]]:
 
 def _get_yesterday_close_sina(code: str) -> Optional[float]:
     """用新浪历史接口获取最近一条日线收盘价（昨收）"""
-    try:
-        symbol = f"{get_exchange_prefix(code)}{code}"
-        df = ak.fund_etf_hist_sina(symbol=symbol)
-        if df is None or df.empty:
-            return None
-        df = df.sort_values("date", ascending=False).reset_index(drop=True)
-        today = datetime.now().strftime("%Y-%m-%d")
-        latest_date = str(df.iloc[0]["date"])
-        # 盘中时 fund_etf_hist_sina 尚未更新今天K线，latest_date 是昨天
-        if latest_date == today:
-            # 收盘后：今天数据已更新，昨收在第二条
-            if len(df) >= 2:
-                return float(df.iloc[1]["close"])
-        else:
-            # 盘中：今天数据未更新，第一条就是昨收
-            return float(df.iloc[0]["close"])
+    df = _fetch_sina_history(code, min_rows=2)
+    if df is None:
         return None
-    except Exception:
-        return None
+    today = datetime.now().strftime("%Y-%m-%d")
+    latest_date = str(df.iloc[-1]["date"])
+    # 盘中时 fund_etf_hist_sina 尚未更新今天K线，latest_date 是昨天
+    if latest_date == today:
+        # 收盘后：今天数据已更新，昨收在倒数第二条
+        if len(df) >= 2:
+            return float(df.iloc[-2]["close"])
+    else:
+        # 盘中：今天数据未更新，最后一条就是昨收
+        return float(df.iloc[-1]["close"])
+    return None
 
 
 def fetch_history_close(code: str, n: int = 3) -> Optional[List[Dict]]:
     """
-    非交易时段数据源：用 fund_etf_hist_sina 取最近N条日线
+    非交易时段数据源：用 sina 历史接口取最近N条日线
     返回: [{date, close, volume}, ...] 按日期降序
     """
-    try:
-        symbol = f"{get_exchange_prefix(code)}{code}"
-        df = ak.fund_etf_hist_sina(symbol=symbol)
-        if df is None or df.empty:
-            return None
-        df = df.sort_values("date", ascending=False).reset_index(drop=True)
-        if len(df) < n:
-            return None
-        rows = []
-        for i in range(n):
-            rows.append({
-                "date": str(df.iloc[i]["date"]),
-                "close": float(df.iloc[i]["close"]),
-                "volume": int(df.iloc[i]["volume"]),
-            })
-        return rows
-    except Exception:
+    df = _fetch_sina_history(code, min_rows=n)
+    if df is None:
         return None
+    rows = []
+    for i in range(1, n + 1):
+        rows.append({
+            "date": str(df.iloc[-i]["date"]),
+            "close": float(df.iloc[-i]["close"]),
+            "volume": int(df.iloc[-i]["volume"]),
+        })
+    return rows
 
 
 # 20日均价缓存
@@ -210,15 +223,12 @@ def fetch_30d_change(code: str) -> Optional[float]:
     except Exception:
         pass
     
-    # 方案2: 新浪数据源
+    # 方案2: 新浪数据源（与 sina 缓存统一入口合并后只剩 1 次 HTTP）
     try:
-        prefix = "sh" if code.startswith(("5", "6")) else "sz"
-        symbol = f"{prefix}{code}"
-        df = ak.fund_etf_hist_sina(symbol=symbol)
-        if df is not None and not df.empty and len(df) >= 31:
-            df = df.sort_values("date", ascending=False).reset_index(drop=True)
-            price_now = float(df.iloc[0]["close"])
-            price_30d_ago = float(df.iloc[30]["close"])
+        df = _fetch_sina_history(code, min_rows=31)
+        if df is not None:
+            price_now = float(df.iloc[-1]["close"])
+            price_30d_ago = float(df.iloc[-31]["close"])
             if price_30d_ago > 0:
                 change_30d = round((price_now - price_30d_ago) / price_30d_ago * 100, 2)
                 _change_30d_cache[code] = change_30d
