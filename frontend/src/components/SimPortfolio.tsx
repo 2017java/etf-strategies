@@ -1033,7 +1033,7 @@ export default function SimPortfolio() {
         <BatchBuyModal
           quantTop5={data.quant_top5}
           allEtfs={data.etf_list}
-          availableCash={portfolio?.available_cash() ?? 0}
+          availableCash={portfolio?.available_cash ?? 0}
           onClose={() => setShowBuy(false)}
           onSuccess={load}
         />

@@ -5,6 +5,7 @@ import QuantRanking from "./QuantRanking";
 import LLMRecommend from "./LLMRecommend";
 import SimPortfolio from "./SimPortfolio";
 import ETFDetail from "./ETFDetail";
+import ProgressBar from "./ProgressBar";
 import { RefreshCw, BarChart3, Wallet, Activity, Trophy, TrendingUp, Zap } from "lucide-react";
 import type { ETFItem } from "../types";
 
