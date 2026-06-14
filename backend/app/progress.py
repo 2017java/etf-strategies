@@ -29,10 +29,18 @@ def reset(total: int = 0) -> None:
 
 
 def tick(amount: int = 1, phase: str | None = None) -> None:
+    """累加进度。amount=0 时只更新 phase 不增加计数（用于阶段标记）"""
     with _lock:
-        _state["done"] += amount
+        if amount > 0:
+            _state["done"] += amount
         if phase is not None:
             _state["phase"] = phase
+
+
+def set_phase(phase: str) -> None:
+    """仅更新 phase 标记，不修改计数"""
+    with _lock:
+        _state["phase"] = phase
 
 
 def finish() -> None:

@@ -393,15 +393,42 @@ LLM_MODEL=deepseek-v4-pro
 - 策略对比：❌ 完全不可用（API 不存在）
 - ETF K 线详情：❌ 完全不可用（路由未注册）
 
-### 待决策：三种修复策略
-1. **恢复原始版**：从 `28f78de` 提取 17 个差异文件覆盖，再单独加 v2.1 新功能
-2. **保留当前版补齐缺失**：基于当前版本修复前后端 API 对齐（12 个 CRITICAL）
-3. **混合策略**：后端恢复原始版（更完整），前端基于当前版修复对齐（UI 更好）
+### 待决策：三种修复策略 → **已选策略1：恢复原始版**
 
-### Git 仓库关系处理建议
-- 两个本地仓库共享同一远程 `https://github.com/2017java/zhitu.git`，push 会冲突
-- 远程 master 只有一个无关提交（知途项目），ETF 代码从未 push 上去
-- 建议为 ETF 项目创建独立 GitHub 仓库，修改 remote，与父级 AICoding 彻底解耦
-- `ETF交易策略v2.0.0/docs/` 目录不被任何 git 管理，需纳入独立仓库
-- 父级仓库需清理 ETF 相关旧分支和脏 index
+---
+
+## [RESTORE] 28f78de 原始代码恢复 + v2.1 合并 — 2026-06-12
+
+### 已完成
+- 创建 `fix/restore-28f78de` 分支 (commit `ba4abb4b`)，从 `_git1247/$RX3BTPR.git` 的 `28f78de` 提取 18 个差异文件覆盖当前版本
+- 后端 16 个文件恢复：calculator, backtest_routes, models, data_fetcher, data_store, datasource, llm_recommender, config, tushare_store, backtest/engine, backtest/metrics, strategies/{base,l1,l2,l3}, sim_portfolio
+- 前端 3 个文件恢复：BacktestRunner, BacktestCompare, LLMRecommend
+- v2.1 合并：main.py 注册 kline_routes、kline_routes 响应格式改为 `{code,name,kline}`、api.ts getEtfKline URL 修正、Dashboard selectedEtf+ETFDetail、ETFTable/QuantRanking/LLMRecommend onEtfClick
+- .gitignore 添加 `_git1247/`, `_git1308/`, `SESSION_HANDOFF_*.md`
+- 验证通过：pytest 37/37、npm build 0 error、app import OK
+
+### 决策
+- 选策略1（恢复原始版覆盖+合并v2.1增量）而非策略2/3，因为重建版12个CRITICAL问题说明与后端严重脱节
+- kline 路由保持后端 `/api/kline/{code}` RESTful 格式，改前端对齐
+- onEtfClick 类型转换：QuantRanking/LLMRecommend 通过 `etf_list.find()` 转为 ETFItem
+
+### 仍未解决
+- **用户尚未手动测试功能**：需启动项目验证 6 大模块（行情/AI推荐/回测/对比/ETF详情/模拟盘）
+- **尚未合并到 main**：等用户确认测试通过
+- v2.1 遗留功能：SimPortfolio onEtfClick、BatchBuyModal 均分/自定义、PositionEditModal ETF 搜索
+- Git 仓库解耦：ETF 和父级 AICoding 共享远程 `zhitu.git`，push 会冲突
+
+### 风险
+- `fix/restore-28f78de` 分支的 git ref 有 fsmonitor 写入问题，已手动修复 `.git/refs/heads/fix/restore-28f78de`，后续操作仍需 `git -c core.fsmonitor=false`
+- `_git1247/` 和 `_git1308/` 是回收站恢复的 .git 目录，**不要删除**
+
+### 建议先读
+- `implementation-notes.md` — 本次恢复的决策日志（D10-D14）和修改实录（M7-M15）
+- `SESSION_HANDOFF_2026-06-12.md` — 一次性交接文件
+
+### 推荐下一步
+1. 用户启动项目测试（双击 start.bat）
+2. 确认后合并 fix/restore-28f78de → main
+3. 补充 v2.1 遗留功能
+4. Git 仓库解耦
 

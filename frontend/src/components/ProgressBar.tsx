@@ -13,7 +13,8 @@ export default function ProgressBar() {
   const { progress, loading } = useDashboard();
   if (!loading || !progress) return null;
   const { done, total, phase, elapsed_sec } = progress;
-  const pct = total > 0 ? Math.min(Math.round((done / total) * 100), 100) : 0;
+  const safeDone = total > 0 ? Math.min(done, total) : done;
+  const pct = total > 0 ? Math.min(Math.round((safeDone / total) * 100), 100) : 0;
   const phaseLabel = PHASE_LABEL[phase] || phase;
 
   return (
@@ -22,7 +23,7 @@ export default function ProgressBar() {
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between mb-1.5">
           <span className="font-medium text-slate-700">
-            {phaseLabel} <span className="text-slate-400">·</span> {done}/{total}
+            {phaseLabel} <span className="text-slate-400">·</span> {safeDone}/{total}
           </span>
           <span className="text-xs text-slate-400 tabular-nums">{elapsed_sec}s</span>
         </div>

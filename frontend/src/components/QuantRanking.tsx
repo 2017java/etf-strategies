@@ -41,68 +41,67 @@ export default function QuantRanking({ data, onEtfClick }: { data: QuantRecommen
         {data.map((item, idx) => (
           <div
             key={item.code}
-            className={`relative rounded-xl border p-4 bg-gradient-to-br ${rankStyles[idx]} transition-all hover:shadow-md`}
+            className={`relative rounded-xl border p-4 pr-28 sm:pr-32 bg-gradient-to-br ${rankStyles[idx]} transition-all hover:shadow-md`}
           >
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shadow-sm ${rankBadges[idx]}`}>
-                  {item.rank}
-                </span>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-slate-800 text-base">
-                      {onEtfClick ? (
-                        <button onClick={() => onEtfClick(item)} className="hover:text-primary-600 hover:underline">{item.name}</button>
-                      ) : item.name}
+            <div className="flex items-start gap-3">
+              <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shadow-sm flex-shrink-0 ${rankBadges[idx]}`}>
+                {item.rank}
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-bold text-slate-800 text-base">
+                    {onEtfClick ? (
+                      <button onClick={() => onEtfClick(item)} className="hover:text-primary-600 hover:underline">{item.name}</button>
+                    ) : item.name}
+                  </span>
+                  <span className="font-mono text-xs text-slate-400">
+                    {onEtfClick ? (
+                      <button onClick={() => onEtfClick(item)} className="hover:text-primary-600">{item.code}</button>
+                    ) : item.code}
+                  </span>
+                  <span className="text-xs px-1.5 py-0.5 rounded bg-white/70 text-slate-500 border border-slate-100">
+                    {item.category}
+                  </span>
+                </div>
+                <div className="flex items-center gap-x-3 gap-y-1 mt-2 text-xs text-slate-500 flex-wrap">
+                  <span className="inline-flex items-center gap-1">
+                    <Activity size={12} className={item.current_change_pct >= 0 ? 'text-rise' : 'text-fall'} />
+                    涨跌 {item.current_change_pct > 0 ? '+' : ''}{item.current_change_pct.toFixed(2)}%
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <TrendingUp size={12} className={item.two_day_change_pct >= 0 ? 'text-rise' : 'text-fall'} />
+                    两日累计 {item.two_day_change_pct > 0 ? '+' : ''}{item.two_day_change_pct.toFixed(2)}%
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <BarChart3 size={12} className={item.volume_expand_pct >= 0 ? 'text-primary-500' : 'text-slate-400'} />
+                    成交量放大 {item.volume_expand_pct > 0 ? '+' : ''}{item.volume_expand_pct.toFixed(2)}%
+                  </span>
+                  {item.ma20_confirmed ? (
+                    <span className="inline-flex items-center gap-1 text-green-600 font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                      MA20确认 +50
                     </span>
-                    <span className="font-mono text-xs text-slate-400">
-                      {onEtfClick ? (
-                        <button onClick={() => onEtfClick(item)} className="hover:text-primary-600">{item.code}</button>
-                      ) : item.code}
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-slate-300">
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+                      MA20未确认
                     </span>
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-white/70 text-slate-500 border border-slate-100">
-                      {item.category}
+                  )}
+                  {item.change_30d_score != null && (
+                    <span className={`inline-flex items-center gap-1 ${item.change_30d_score >= 25 ? 'text-orange-600 font-medium' : 'text-slate-500'}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${item.change_30d_score >= 25 ? 'bg-orange-500' : 'bg-slate-400'}`} />
+                      30日标准分 +{item.change_30d_score.toFixed(1)}
                     </span>
-                  </div>
-                  <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
-                    <span className="inline-flex items-center gap-1">
-                      <Activity size={12} className={item.current_change_pct >= 0 ? 'text-rise' : 'text-fall'} />
-                      涨跌 {item.current_change_pct > 0 ? '+' : ''}{item.current_change_pct.toFixed(2)}%
-                    </span>
-                    <span className="inline-flex items-center gap-1">
-                      <TrendingUp size={12} className={item.two_day_change_pct >= 0 ? 'text-rise' : 'text-fall'} />
-                      两日累计 {item.two_day_change_pct > 0 ? '+' : ''}{item.two_day_change_pct.toFixed(2)}%
-                    </span>
-                    <span className="inline-flex items-center gap-1">
-                      <BarChart3 size={12} className={item.volume_expand_pct >= 0 ? 'text-primary-500' : 'text-slate-400'} />
-                      成交量放大 {item.volume_expand_pct > 0 ? '+' : ''}{item.volume_expand_pct.toFixed(2)}%
-                    </span>
-                    {item.ma20_confirmed ? (
-                      <span className="inline-flex items-center gap-1 text-green-600 font-medium">
-                        <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                        MA20确认 +50
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 text-slate-300">
-                        <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-                        MA20未确认
-                      </span>
-                    )}
-                    {item.change_30d_score != null && (
-                      <span className={`inline-flex items-center gap-1 ${item.change_30d_score >= 25 ? 'text-orange-600 font-medium' : 'text-slate-500'}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${item.change_30d_score >= 25 ? 'bg-orange-500' : 'bg-slate-400'}`} />
-                        30日标准分 +{item.change_30d_score.toFixed(1)}
-                      </span>
-                    )}
-                  </div>
+                  )}
                 </div>
               </div>
-              <div className="text-right flex-shrink-0">
-                <div className={`text-2xl font-bold ${item.composite_score >= 0 ? 'text-rise' : 'text-fall'}`}>
-                  {item.composite_score > 0 ? '+' : ''}{item.composite_score.toFixed(2)}
-                </div>
-                <div className="text-xs text-slate-400 mt-0.5">综合得分</div>
+            </div>
+            {/* 评分独立定位到右上角，避免长内容压缩 */}
+            <div className="absolute top-4 right-4 text-right pointer-events-none">
+              <div className={`text-xl sm:text-2xl font-bold tabular-nums ${item.composite_score >= 0 ? 'text-rise' : 'text-fall'}`}>
+                {item.composite_score > 0 ? '+' : ''}{item.composite_score.toFixed(2)}
               </div>
+              <div className="text-xs text-slate-400 mt-0.5">综合得分</div>
             </div>
             <ScoreBar score={item.composite_score} max={maxScore} />
           </div>

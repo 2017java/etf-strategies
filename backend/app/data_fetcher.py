@@ -360,7 +360,7 @@ def fetch_all_etf_data(max_workers: int = 15) -> Tuple[Dict[str, List[dict]], bo
     all_etfs = [(cat, etf) for cat, etfs in ETF_POOL.items() for etf in etfs]
     total = len(all_etfs)
     progress.reset(total=total)
-    progress.tick(phase="starting")
+    progress.set_phase("starting")
 
     result: Dict[str, List[dict]] = {cat: [] for cat in ETF_POOL}
 
@@ -379,7 +379,7 @@ def fetch_all_etf_data(max_workers: int = 15) -> Tuple[Dict[str, List[dict]], bo
             except Exception:
                 pass
 
-    progress.tick(phase="done")
+    progress.set_phase("done")
     progress.finish()
     _cleanup_ohlcv_cache()
     return result, trading

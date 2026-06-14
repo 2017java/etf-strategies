@@ -38,12 +38,18 @@ function BatchBuyModal({
 }) {
   const [mode, setMode] = useState<'even' | 'custom'>('even');
   const [selected, setSelected] = useState<string[]>([]);
-  const [amounts, setAmounts] = useState<Record<string, number>>({});
+  // amount 用字符串维护，避免 Number() 转换造成的 0100/NaN 等问题
+  const [amounts, setAmounts] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const wideBase = allEtfs.filter((e) => e.category === "宽基ETF");
   const industryBase = allEtfs.filter((e) => e.category === "行业ETF");
+
+  const parseAmount = (s: string | undefined): number => {
+    const n = parseFloat(s ?? "");
+    return Number.isFinite(n) && n > 0 ? n : 0;
+  };
 
   const toggle = (code: string) => {
     setSelected((prev) => {
@@ -51,20 +57,20 @@ function BatchBuyModal({
       // 初次选中时，预填均分金额（向下取整 100）
       if (!prev.includes(code) && mode === 'custom' && !amounts[code]) {
         const even = Math.floor((availableCash / (next.length || 1)) / 100) * 100;
-        setAmounts((a) => ({ ...a, [code]: even }));
+        setAmounts((a) => ({ ...a, [code]: String(even) }));
       }
       return next;
     });
   };
 
-  const totalAllocated = selected.reduce((sum, c) => sum + (amounts[c] || 0), 0);
+  const totalAllocated = selected.reduce((sum, c) => sum + parseAmount(amounts[c]), 0);
   const overBudget = totalAllocated > availableCash;
   const evenHint = selected.length > 0 ? Math.floor((availableCash / selected.length) / 100) * 100 : 0;
 
   const applyEvenDistribution = () => {
     const even = selected.length > 0 ? Math.floor((availableCash / selected.length) / 100) * 100 : 0;
-    const next: Record<string, number> = {};
-    selected.forEach((c) => { next[c] = even; });
+    const next: Record<string, string> = {};
+    selected.forEach((c) => { next[c] = String(even); });
     setAmounts(next);
   };
 
@@ -84,7 +90,7 @@ function BatchBuyModal({
         throw new Error("所选ETF行情缺失，请刷新页面重试");
       }
       if (mode === 'custom') {
-        return { code, name: quantEtf?.name || etfItem.name, price: etfItem.current_price, shares: 0, amount: amounts[code] || 0 };
+        return { code, name: quantEtf?.name || etfItem.name, price: etfItem.current_price, shares: 0, amount: parseAmount(amounts[code]) };
       }
       return { code, name: quantEtf?.name || etfItem.name, price: etfItem.current_price, shares: 0 };
     });
@@ -101,21 +107,17 @@ function BatchBuyModal({
     }
   };
 
-  function EtfCheckbox({
-    code,
-    name,
-    price,
-    changePct,
-  }: {
-    code: string;
-    name: string;
-    price: number;
-    changePct?: number;
-  }) {
+  // 内联渲染单个 ETF 选项，不再用嵌套函数组件（避免每次 setState 重建组件导致 input 失焦）
+  const renderEtfOption = (
+    code: string,
+    name: string,
+    changePct?: number,
+  ) => {
     const isSelected = selected.includes(code);
     const isUp = (changePct ?? 0) >= 0;
     return (
       <div
+        key={code}
         className={
           "flex items-center gap-2 px-3 py-2 rounded-xl border text-sm transition-all flex-shrink-0 " +
           (isSelected
@@ -134,20 +136,21 @@ function BatchBuyModal({
           <span className="text-xs text-slate-400 font-mono">{code}</span>
         </label>
         {changePct !== undefined && (
-          <span
-            className={"text-xs font-mono " + (isUp ? "text-rise" : "text-fall")}
-          >
+          <span className={"text-xs font-mono " + (isUp ? "text-rise" : "text-fall")}>
             {isUp ? "+" : ""}
             {changePct.toFixed(2)}%
           </span>
         )}
         {isSelected && mode === 'custom' && (
           <input
-            type="number"
-            step="100"
-            min="0"
-            value={amounts[code] || 0}
-            onChange={(e) => setAmounts({ ...amounts, [code]: Number(e.target.value) })}
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={amounts[code] ?? ""}
+            onChange={(e) => {
+              const raw = e.target.value.replace(/[^\d]/g, "");
+              setAmounts((a) => ({ ...a, [code]: raw }));
+            }}
             onClick={(e) => e.stopPropagation()}
             className="w-24 px-2 py-1 text-xs rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-primary-300"
             placeholder="元"
@@ -155,7 +158,7 @@ function BatchBuyModal({
         )}
       </div>
     );
-  }
+  };
 
   function Section({
     title,
@@ -172,15 +175,7 @@ function BatchBuyModal({
           <span className="text-xs text-slate-400">{etfs.length} 只</span>
         </div>
         <div className="flex flex-wrap gap-2 max-h-44 overflow-y-auto pr-1">
-          {etfs.map((etf) => (
-            <EtfCheckbox
-              key={etf.code}
-              code={etf.code}
-              name={etf.name}
-              price={etf.current_price}
-              changePct={etf.current_change_pct}
-            />
-          ))}
+          {etfs.map((etf) => renderEtfOption(etf.code, etf.name, etf.current_change_pct))}
         </div>
       </div>
     );
@@ -399,25 +394,40 @@ function PositionEditModal({
   onClose: () => void;
   onSuccess: () => void;
 }) {
+  // 用字符串维护数字输入，避免 "0"+输入=>"0100" / 删空变 NaN 等问题
   const [form, setForm] = useState({
     code: position?.code || "",
     name: position?.name || "",
-    shares: position?.shares || 0,
-    avg_cost: position?.avg_cost || 0,
-    current_price: position?.current_price || 0,
+    shares: position?.shares ? String(position.shares) : "",
+    avg_cost: position?.avg_cost ? String(position.avg_cost) : "",
+    current_price: position?.current_price ? String(position.current_price) : "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPicker, setShowPicker] = useState(false);
 
+  const parseNum = (s: string): number => {
+    const n = parseFloat(s);
+    return Number.isFinite(n) ? n : 0;
+  };
+
   const save = async () => {
-    if (!form.code || form.shares <= 0 || form.avg_cost <= 0) {
+    const sharesNum = parseNum(form.shares);
+    const avgCostNum = parseNum(form.avg_cost);
+    const currentPriceNum = parseNum(form.current_price);
+    if (!form.code || sharesNum <= 0 || avgCostNum <= 0) {
       setError("请填写完整且有效的数据");
       return;
     }
     setLoading(true);
     try {
-      await upsertPositionSim(form as SimPosition);
+      await upsertPositionSim({
+        code: form.code,
+        name: form.name,
+        shares: sharesNum,
+        avg_cost: avgCostNum,
+        current_price: currentPriceNum,
+      } as SimPosition);
       onSuccess();
       onClose();
     } catch (e: any) {
@@ -428,11 +438,14 @@ function PositionEditModal({
   };
 
   const handlePick = (etf: { code: string; name: string; current_price: number }) => {
+    const priceStr = etf.current_price ? String(etf.current_price) : form.current_price;
     setForm({
       ...form,
       code: etf.code,
       name: etf.name,
-      current_price: etf.current_price || form.current_price,
+      current_price: priceStr,
+      // 没填买入均价时自动用当前市价填充（用户可改）
+      avg_cost: form.avg_cost && parseNum(form.avg_cost) > 0 ? form.avg_cost : priceStr,
     });
     setShowPicker(false);
   };
@@ -481,31 +494,36 @@ function PositionEditModal({
               <div>
                 <label className="block text-sm font-medium text-slate-600 mb-1">持仓份额</label>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={form.shares}
-                  onChange={(e) => setForm({ ...form, shares: Number(e.target.value) })}
+                  onChange={(e) => setForm({ ...form, shares: e.target.value.replace(/[^\d]/g, "") })}
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+                  placeholder="如 1000"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-600 mb-1">持仓均价</label>
+                <label className="block text-sm font-medium text-slate-600 mb-1">买入均价（默认当前市价）</label>
                 <input
-                  type="number"
-                  step="0.001"
+                  type="text"
+                  inputMode="decimal"
                   value={form.avg_cost}
-                  onChange={(e) => setForm({ ...form, avg_cost: Number(e.target.value) })}
+                  onChange={(e) => setForm({ ...form, avg_cost: e.target.value.replace(/[^\d.]/g, "") })}
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+                  placeholder="选 ETF 后自动填入"
                 />
               </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-600 mb-1">当前市价（快照）</label>
               <input
-                type="number"
-                step="0.001"
+                type="text"
+                inputMode="decimal"
                 value={form.current_price}
-                onChange={(e) => setForm({ ...form, current_price: Number(e.target.value) })}
+                onChange={(e) => setForm({ ...form, current_price: e.target.value.replace(/[^\d.]/g, "") })}
                 className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+                placeholder="选 ETF 后自动填入"
               />
             </div>
             {error && (
