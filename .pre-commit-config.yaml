@@ -1,0 +1,36 @@
+# pre-commit hooks 配置
+# 安装：pip install pre-commit && pre-commit install
+# 手动跑全仓扫描：pre-commit run --all-files
+# 临时跳过（不推荐）：git commit --no-verify
+
+repos:
+  # ── 1. 通用文件检查 ──────────────────────────────────
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace          # 行末空格
+      - id: end-of-file-fixer            # 文件末尾换行
+      - id: check-yaml                   # YAML 语法
+      - id: check-json                   # JSON 语法
+      - id: check-merge-conflict         # 合并冲突标记
+      - id: check-added-large-files      # 阻止 >500KB 文件
+        args: [--maxkb=500]
+      - id: detect-private-key           # SSH/GPG 私钥
+      - id: check-case-conflict          # Windows/macOS 大小写冲突
+
+  # ── 2. 敏感凭证扫描（核心防线）──────────────────────
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: 'package-lock.json|yarn.lock|\.secrets\.baseline$|implementation-notes.*\.md$|PROJECT_MEMORY\.md$'
+
+  # ── 3. Python 代码检查（可选）───────────────────────
+  # 如果不想要可注释掉
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.6
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^backend/
