@@ -26,29 +26,61 @@ function fmtPct(n: number) {
 function BatchBuyModal({
   quantTop5,
   allEtfs,
+  availableCash,
   onClose,
   onSuccess,
 }: {
   quantTop5: QuantRecommend[];
   allEtfs: ETFItem[];
+  availableCash: number;
   onClose: () => void;
   onSuccess: () => void;
 }) {
+  const [mode, setMode] = useState<'even' | 'custom'>('even');
   const [selected, setSelected] = useState<string[]>([]);
+  // amount 用字符串维护，避免 Number() 转换造成的 0100/NaN 等问题
+  const [amounts, setAmounts] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const wideBase = allEtfs.filter((e) => e.category === "宽基ETF");
   const industryBase = allEtfs.filter((e) => e.category === "行业ETF");
 
-  const toggle = (code: string) =>
-    setSelected((prev) =>
-      prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]
-    );
+  const parseAmount = (s: string | undefined): number => {
+    const n = parseFloat(s ?? "");
+    return Number.isFinite(n) && n > 0 ? n : 0;
+  };
+
+  const toggle = (code: string) => {
+    setSelected((prev) => {
+      const next = prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code];
+      // 初次选中时，预填均分金额（向下取整 100）
+      if (!prev.includes(code) && mode === 'custom' && !amounts[code]) {
+        const even = Math.floor((availableCash / (next.length || 1)) / 100) * 100;
+        setAmounts((a) => ({ ...a, [code]: String(even) }));
+      }
+      return next;
+    });
+  };
+
+  const totalAllocated = selected.reduce((sum, c) => sum + parseAmount(amounts[c]), 0);
+  const overBudget = totalAllocated > availableCash;
+  const evenHint = selected.length > 0 ? Math.floor((availableCash / selected.length) / 100) * 100 : 0;
+
+  const applyEvenDistribution = () => {
+    const even = selected.length > 0 ? Math.floor((availableCash / selected.length) / 100) * 100 : 0;
+    const next: Record<string, string> = {};
+    selected.forEach((c) => { next[c] = String(even); });
+    setAmounts(next);
+  };
 
   const confirm = async () => {
     if (selected.length === 0) {
       setError("请至少选择一只ETF");
+      return;
+    }
+    if (mode === 'custom' && overBudget) {
+      setError(`自定义金额合计 ${totalAllocated.toFixed(2)} 超过可用资金 ${availableCash.toFixed(2)}`);
       return;
     }
     const items = selected.map((code) => {
@@ -56,6 +88,9 @@ function BatchBuyModal({
       const etfItem = allEtfs.find((e) => e.code === code);
       if (!etfItem || !etfItem.current_price) {
         throw new Error("所选ETF行情缺失，请刷新页面重试");
+      }
+      if (mode === 'custom') {
+        return { code, name: quantEtf?.name || etfItem.name, price: etfItem.current_price, shares: 0, amount: parseAmount(amounts[code]) };
       }
       return { code, name: quantEtf?.name || etfItem.name, price: etfItem.current_price, shares: 0 };
     });
@@ -72,47 +107,58 @@ function BatchBuyModal({
     }
   };
 
-  function EtfCheckbox({
-    code,
-    name,
-    price,
-    changePct,
-  }: {
-    code: string;
-    name: string;
-    price: number;
-    changePct?: number;
-  }) {
+  // 内联渲染单个 ETF 选项，不再用嵌套函数组件（避免每次 setState 重建组件导致 input 失焦）
+  const renderEtfOption = (
+    code: string,
+    name: string,
+    changePct?: number,
+  ) => {
     const isSelected = selected.includes(code);
     const isUp = (changePct ?? 0) >= 0;
     return (
-      <label
+      <div
+        key={code}
         className={
-          "flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer text-sm transition-all flex-shrink-0 " +
+          "flex items-center gap-2 px-3 py-2 rounded-xl border text-sm transition-all flex-shrink-0 " +
           (isSelected
             ? "border-primary-400 bg-primary-50 text-primary-700"
             : "border-slate-200 hover:border-slate-300 text-slate-600")
         }
       >
-        <input
-          type="checkbox"
-          checked={isSelected}
-          onChange={() => toggle(code)}
-          className="accent-primary-600"
-        />
-        <span className="font-medium truncate max-w-[80px]">{name}</span>
-        <span className="text-xs text-slate-400 font-mono">{code}</span>
+        <label className="flex items-center gap-2 cursor-pointer flex-1 min-w-0">
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={() => toggle(code)}
+            className="accent-primary-600"
+          />
+          <span className="font-medium truncate max-w-[80px]">{name}</span>
+          <span className="text-xs text-slate-400 font-mono">{code}</span>
+        </label>
         {changePct !== undefined && (
-          <span
-            className={"text-xs font-mono ml-auto " + (isUp ? "text-rise" : "text-fall")}
-          >
+          <span className={"text-xs font-mono " + (isUp ? "text-rise" : "text-fall")}>
             {isUp ? "+" : ""}
             {changePct.toFixed(2)}%
           </span>
         )}
-      </label>
+        {isSelected && mode === 'custom' && (
+          <input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={amounts[code] ?? ""}
+            onChange={(e) => {
+              const raw = e.target.value.replace(/[^\d]/g, "");
+              setAmounts((a) => ({ ...a, [code]: raw }));
+            }}
+            onClick={(e) => e.stopPropagation()}
+            className="w-24 px-2 py-1 text-xs rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-primary-300"
+            placeholder="元"
+          />
+        )}
+      </div>
     );
-  }
+  };
 
   function Section({
     title,
@@ -129,15 +175,7 @@ function BatchBuyModal({
           <span className="text-xs text-slate-400">{etfs.length} 只</span>
         </div>
         <div className="flex flex-wrap gap-2 max-h-44 overflow-y-auto pr-1">
-          {etfs.map((etf) => (
-            <EtfCheckbox
-              key={etf.code}
-              code={etf.code}
-              name={etf.name}
-              price={etf.current_price}
-              changePct={etf.current_change_pct}
-            />
-          ))}
+          {etfs.map((etf) => renderEtfOption(etf.code, etf.name, etf.current_change_pct))}
         </div>
       </div>
     );
@@ -150,15 +188,53 @@ function BatchBuyModal({
           <div>
             <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
               <ShoppingCart size={20} className="text-primary-600" />
-              批量均仓买入
+              批量买入
             </h2>
             <p className="text-xs text-slate-400 mt-0.5">
-              已选 {selected.length} 只 · 资金将均分到每只ETF
+              可用资金 ¥{availableCash.toLocaleString("zh-CN", { maximumFractionDigits: 0 })}
             </p>
           </div>
           <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded-lg">
             <X size={20} className="text-slate-400" />
           </button>
+        </div>
+
+        {/* 模式切换 */}
+        <div className="px-6 py-3 border-b border-slate-100 flex items-center gap-2">
+          <button
+            onClick={() => setMode('even')}
+            className={`px-3 py-1.5 text-xs rounded-lg font-medium transition ${
+              mode === 'even'
+                ? 'bg-primary-600 text-white'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            均分模式
+          </button>
+          <button
+            onClick={() => {
+              setMode('custom');
+              applyEvenDistribution();
+            }}
+            className={`px-3 py-1.5 text-xs rounded-lg font-medium transition ${
+              mode === 'custom'
+                ? 'bg-primary-600 text-white'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            自定义金额
+          </button>
+          {mode === 'custom' && (
+            <span className={`ml-auto text-xs font-medium ${overBudget ? 'text-rose-600' : 'text-slate-500'}`}>
+              已分配 ¥{totalAllocated.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} /
+              剩余 ¥{Math.max(0, availableCash - totalAllocated).toLocaleString("zh-CN", { maximumFractionDigits: 0 })}
+            </span>
+          )}
+          {mode === 'even' && selected.length > 0 && (
+            <span className="ml-auto text-xs text-slate-500">
+              均分后每只 ¥{evenHint.toLocaleString("zh-CN", { maximumFractionDigits: 0 })}
+            </span>
+          )}
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
@@ -203,7 +279,9 @@ function BatchBuyModal({
           <span className="text-sm text-slate-500">
             {selected.length === 0
               ? "请从下方选择ETF"
-              : "资金将均分到 " + selected.length + " 只ETF"}
+              : mode === 'even'
+                ? "资金将均分到 " + selected.length + " 只ETF"
+                : "自定义金额分配到 " + selected.length + " 只ETF"}
           </span>
           <div className="flex gap-3">
             <button
@@ -214,7 +292,7 @@ function BatchBuyModal({
             </button>
             <button
               onClick={confirm}
-              disabled={loading || selected.length === 0}
+              disabled={loading || selected.length === 0 || (mode === 'custom' && overBudget)}
               className="px-5 py-2 rounded-xl bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 disabled:opacity-50"
             >
               {loading ? "买入中..." : "确认买入 (" + selected.length + ")"}
@@ -226,34 +304,130 @@ function BatchBuyModal({
   );
 }
 
+// ── ETF 选择子弹窗 ────────────────────────────────────────────
+function EtfPickerModal({
+  allEtfs,
+  currentCode,
+  onSelect,
+  onClose,
+}: {
+  allEtfs: ETFItem[];
+  currentCode: string;
+  onSelect: (etf: { code: string; name: string; current_price: number }) => void;
+  onClose: () => void;
+}) {
+  const [keyword, setKeyword] = useState("");
+  const wideBase = allEtfs.filter((e) => e.category === "宽基ETF");
+  const industryBase = allEtfs.filter((e) => e.category === "行业ETF");
+  const filterFn = (e: ETFItem) =>
+    !keyword ||
+    e.name.toLowerCase().includes(keyword.toLowerCase()) ||
+    e.code.includes(keyword);
+
+  return (
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[60] p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[70vh] flex flex-col">
+        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+          <h3 className="text-base font-bold text-slate-800">选择 ETF</h3>
+          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded-lg">
+            <X size={18} className="text-slate-400" />
+          </button>
+        </div>
+        <div className="px-6 py-3 border-b border-slate-100">
+          <input
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            placeholder="搜索代码或名称"
+            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+            autoFocus
+          />
+        </div>
+        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
+          {[
+            { title: "📊 宽基 ETF", list: wideBase.filter(filterFn) },
+            { title: "🏭 行业 ETF", list: industryBase.filter(filterFn) },
+          ].map((group) => (
+            <div key={group.title}>
+              <div className="text-xs font-semibold text-slate-500 mb-1.5 px-2">
+                {group.title} · {group.list.length}
+              </div>
+              {group.list.length === 0 ? (
+                <div className="text-xs text-slate-300 px-2 py-1">无匹配</div>
+              ) : (
+                <div className="space-y-0.5">
+                  {group.list.map((e) => (
+                    <button
+                      key={e.code}
+                      onClick={() => onSelect({ code: e.code, name: e.name, current_price: e.current_price })}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition flex items-center gap-2 ${
+                        currentCode === e.code
+                          ? "bg-primary-50 text-primary-700"
+                          : "hover:bg-slate-50 text-slate-700"
+                      }`}
+                    >
+                      <span className="font-medium">{e.name}</span>
+                      <span className="text-xs text-slate-400 font-mono">{e.code}</span>
+                      <span className="ml-auto text-xs font-mono text-slate-500">
+                        ¥{e.current_price.toFixed(3)}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── 持仓编辑弹窗 ────────────────────────────────────────────
 function PositionEditModal({
   position,
+  allEtfs,
   onClose,
   onSuccess,
 }: {
   position?: SimPosition;
+  allEtfs: ETFItem[];
   onClose: () => void;
   onSuccess: () => void;
 }) {
+  // 用字符串维护数字输入，避免 "0"+输入=>"0100" / 删空变 NaN 等问题
   const [form, setForm] = useState({
     code: position?.code || "",
     name: position?.name || "",
-    shares: position?.shares || 0,
-    avg_cost: position?.avg_cost || 0,
-    current_price: position?.current_price || 0,
+    shares: position?.shares ? String(position.shares) : "",
+    avg_cost: position?.avg_cost ? String(position.avg_cost) : "",
+    current_price: position?.current_price ? String(position.current_price) : "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPicker, setShowPicker] = useState(false);
+
+  const parseNum = (s: string): number => {
+    const n = parseFloat(s);
+    return Number.isFinite(n) ? n : 0;
+  };
 
   const save = async () => {
-    if (!form.code || form.shares <= 0 || form.avg_cost <= 0) {
+    const sharesNum = parseNum(form.shares);
+    const avgCostNum = parseNum(form.avg_cost);
+    const currentPriceNum = parseNum(form.current_price);
+    if (!form.code || sharesNum <= 0 || avgCostNum <= 0) {
       setError("请填写完整且有效的数据");
       return;
     }
     setLoading(true);
     try {
-      await upsertPositionSim(form as SimPosition);
+      await upsertPositionSim({
+        code: form.code,
+        name: form.name,
+        shares: sharesNum,
+        avg_cost: avgCostNum,
+        current_price: currentPriceNum,
+      } as SimPosition);
       onSuccess();
       onClose();
     } catch (e: any) {
@@ -263,91 +437,128 @@ function PositionEditModal({
     }
   };
 
+  const handlePick = (etf: { code: string; name: string; current_price: number }) => {
+    const priceStr = etf.current_price ? String(etf.current_price) : form.current_price;
+    setForm({
+      ...form,
+      code: etf.code,
+      name: etf.name,
+      current_price: priceStr,
+      // 没填买入均价时自动用当前市价填充（用户可改）
+      avg_cost: form.avg_cost && parseNum(form.avg_cost) > 0 ? form.avg_cost : priceStr,
+    });
+    setShowPicker(false);
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-          <h2 className="text-lg font-bold text-slate-800">
-            {position ? "编辑持仓" : "新增持仓"}
-          </h2>
-          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded-lg">
-            <X size={20} className="text-slate-400" />
-          </button>
-        </div>
-        <div className="px-6 py-5 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-600 mb-1">ETF代码</label>
-            <input
-              value={form.code}
-              onChange={(e) => setForm({ ...form, code: e.target.value })}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
-              placeholder="如 510300"
-            />
+    <>
+      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+            <h2 className="text-lg font-bold text-slate-800">
+              {position ? "编辑持仓" : "新增持仓"}
+            </h2>
+            <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded-lg">
+              <X size={20} className="text-slate-400" />
+            </button>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-600 mb-1">ETF名称</label>
-            <input
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
-              placeholder="如 沪深300ETF"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="px-6 py-5 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-600 mb-1">持仓份额</label>
-              <input
-                type="number"
-                value={form.shares}
-                onChange={(e) => setForm({ ...form, shares: Number(e.target.value) })}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
-              />
+              <label className="block text-sm font-medium text-slate-600 mb-1">ETF代码</label>
+              <div className="flex gap-2">
+                <input
+                  value={form.code}
+                  onChange={(e) => setForm({ ...form, code: e.target.value })}
+                  className="flex-1 px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+                  placeholder="如 510300"
+                />
+                <button
+                  onClick={() => setShowPicker(true)}
+                  className="px-3 py-2 rounded-xl border border-slate-200 text-slate-600 text-sm hover:bg-slate-50 flex items-center gap-1"
+                  type="button"
+                >
+                  🔍 选择
+                </button>
+              </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-600 mb-1">持仓均价</label>
+              <label className="block text-sm font-medium text-slate-600 mb-1">ETF名称</label>
               <input
-                type="number"
-                step="0.001"
-                value={form.avg_cost}
-                onChange={(e) => setForm({ ...form, avg_cost: Number(e.target.value) })}
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
                 className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+                placeholder="如 沪深300ETF"
               />
             </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-600 mb-1">当前市价（快照）</label>
-            <input
-              type="number"
-              step="0.001"
-              value={form.current_price}
-              onChange={(e) => setForm({ ...form, current_price: Number(e.target.value) })}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
-            />
-          </div>
-          {error && (
-            <div className="rounded-xl bg-rose-50 border border-rose-100 text-rose-700 px-4 py-2 text-sm">
-              {error}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-600 mb-1">持仓份额</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={form.shares}
+                  onChange={(e) => setForm({ ...form, shares: e.target.value.replace(/[^\d]/g, "") })}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+                  placeholder="如 1000"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-600 mb-1">买入均价（默认当前市价）</label>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={form.avg_cost}
+                  onChange={(e) => setForm({ ...form, avg_cost: e.target.value.replace(/[^\d.]/g, "") })}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+                  placeholder="选 ETF 后自动填入"
+                />
+              </div>
             </div>
-          )}
-        </div>
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-100">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50"
-          >
-            取消
-          </button>
-          <button
-            onClick={save}
-            disabled={loading}
-            className="px-5 py-2 rounded-xl bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 disabled:opacity-50 flex items-center gap-2"
-          >
-            <Save size={14} />
-            {loading ? "保存中..." : "保存"}
-          </button>
+            <div>
+              <label className="block text-sm font-medium text-slate-600 mb-1">当前市价（快照）</label>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={form.current_price}
+                onChange={(e) => setForm({ ...form, current_price: e.target.value.replace(/[^\d.]/g, "") })}
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+                placeholder="选 ETF 后自动填入"
+              />
+            </div>
+            {error && (
+              <div className="rounded-xl bg-rose-50 border border-rose-100 text-rose-700 px-4 py-2 text-sm">
+                {error}
+              </div>
+            )}
+          </div>
+          <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-100">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50"
+            >
+              取消
+            </button>
+            <button
+              onClick={save}
+              disabled={loading}
+              className="px-5 py-2 rounded-xl bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 disabled:opacity-50 flex items-center gap-2"
+            >
+              <Save size={14} />
+              {loading ? "保存中..." : "保存"}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+      {showPicker && (
+        <EtfPickerModal
+          allEtfs={allEtfs}
+          currentCode={form.code}
+          onSelect={handlePick}
+          onClose={() => setShowPicker(false)}
+        />
+      )}
+    </>
   );
 }
 
@@ -840,12 +1051,18 @@ export default function SimPortfolio() {
         <BatchBuyModal
           quantTop5={data.quant_top5}
           allEtfs={data.etf_list}
+          availableCash={portfolio?.available_cash ?? 0}
           onClose={() => setShowBuy(false)}
           onSuccess={load}
         />
       )}
-      {showPosEdit && (
-        <PositionEditModal position={editingPosition || undefined} onClose={() => setShowPosEdit(false)} onSuccess={load} />
+      {showPosEdit && data && (
+        <PositionEditModal
+          position={editingPosition || undefined}
+          allEtfs={data.etf_list}
+          onClose={() => setShowPosEdit(false)}
+          onSuccess={load}
+        />
       )}
       {showTradeEdit !== undefined && (
         <TradeEditModal trade={showTradeEdit} onClose={() => setShowTradeEdit(undefined)} onSuccess={load} />

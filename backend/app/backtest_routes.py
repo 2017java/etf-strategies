@@ -1,138 +1,229 @@
-import json
-import logging
-from datetime import date, timedelta
-from pathlib import Path
-from typing import List, Optional
+from fastapi import APIRouter
+from datetime import date
+import pandas as pd
 
-from fastapi import APIRouter, Query
-from pydantic import BaseModel
-
-from app.config import BENCHMARK_REGISTRY, DEFAULT_ETF_CODES, BACKTEST_RUNS_DIR
+from app.models import (
+    BacktestRequest, BacktestCompareRequest,
+    BacktestResultResponse, TradeItem, SignalItem, NavPoint,
+    StrategyListResponse, StrategyInfo,
+    BenchmarkListResponse, BenchmarkInfo,
+)
 from app.datasource import create_data_store
 from app.backtest.engine import BacktestEngine
 from app.strategies.l1_trend_score import L1TrendScore
 from app.strategies.l2_multi_factor import L2MultiFactor
 from app.strategies.l3_multi_factor_rsrs import L3MultiFactorRSRS
-from app.models import BenchmarkInfo, BenchmarkListResponse
 
-_log = logging.getLogger("app.backtest_routes")
 
 router = APIRouter(prefix="/api/backtest", tags=["backtest"])
 
+DEFAULT_ETF_CODES = [
+    "510300",  # 沪深300ETF
+    "510500",  # 中证500ETF
+    "510180",  # 上证180ETF
+    "510050",  # 上证50ETF
+    "512100",  # 中证1000ETF
+    "159915",  # 创业板ETF
+    "510900",  # H股ETF
+    "513100",  # 纳指ETF
+    "513500",  # 标普500ETF
+    "518880",  # 黄金ETF
+    "511010",  # 国债ETF
+    "512880",  # 证券ETF
+    "512660",  # 军工ETF
+    "512690",  # 酒ETF
+    "512170",  # 医疗ETF
+    "515050",  # 5G ETF
+    "515030",  # 新能源车ETF
+    "512760",  # 半导体ETF
+    "515790",  # 光伏ETF
+    "159995",  # 芯片ETF
+]
+
+
 STRATEGY_REGISTRY = {
-    "l1": {"name": "L1趋势动量", "class": L1TrendScore},
-    "l2": {"name": "L2多因子", "class": L2MultiFactor},
-    "l3": {"name": "L3多因子+RSRS", "class": L3MultiFactorRSRS},
+    "l1": {
+        "name": "L1 趋势评分 TOP1",
+        "description": "对每只ETF用最近N日K线做对数价格线性回归，取年化收益×R²最高的1只ETF。日频调仓。",
+        "rebalance_freq": "daily",
+    },
+    "l2": {
+        "name": "L2 多因子 TOP5",
+        "description": "综合动量(30%)、量能(20%)、反转(15%)、估值复合(25%)、波动率倒数(10%)，每月初选综合评分最高的5只ETF等权配置。",
+        "rebalance_freq": "monthly",
+    },
+    "l3": {
+        "name": "L3 多因子 + RSRS 择时",
+        "description": "在 L2 多因子基础上，加入 RSRS（阻力支撑相对强度）择时：大盘弱势时空仓，同时剔除 RSRS 弱的个股。",
+        "rebalance_freq": "monthly",
+    },
 }
 
-assert set(BENCHMARK_REGISTRY.keys()) >= set(DEFAULT_ETF_CODES), (
-    "BENCHMARK_REGISTRY must cover all DEFAULT_ETF_CODES"
-)
+
+BENCHMARK_REGISTRY: dict[str, str] = {
+    code: name
+    for code, name in [
+        ("510300", "沪深300ETF"),
+        ("510500", "中证500ETF"),
+        ("510180", "上证180ETF"),
+        ("510050", "上证50ETF"),
+        ("512100", "中证1000ETF"),
+        ("159915", "创业板ETF"),
+        ("510900", "H股ETF"),
+        ("513100", "纳指ETF"),
+        ("513500", "标普500ETF"),
+        ("518880", "黄金ETF"),
+        ("511010", "国债ETF"),
+        ("512880", "证券ETF"),
+        ("512660", "军工ETF"),
+        ("512690", "酒ETF"),
+        ("512170", "医疗ETF"),
+        ("515050", "5G ETF"),
+        ("515030", "新能源车ETF"),
+        ("512760", "半导体ETF"),
+        ("515790", "光伏ETF"),
+        ("159995", "芯片ETF"),
+    ]
+}
 
 
-class BacktestRequest(BaseModel):
-    start_date: str
-    end_date: str
-    strategy_ids: List[str] = ["l1"]
-    codes: List[str] = DEFAULT_ETF_CODES
-    benchmark_code: str = "510300"
-    initial_cash: float = 1_000_000.0
-    cost_rate: float = 0.0002
+_DEFAULT_CODES_SET = set(DEFAULT_ETF_CODES)
+_MISSING = [c for c in _DEFAULT_CODES_SET if c not in BENCHMARK_REGISTRY]
+assert not _MISSING, f"BENCHMARK_REGISTRY 缺少以下默认 ETF: {_MISSING}"
 
 
-class BacktestRunResponse(BaseModel):
-    success: bool
-    message: str = ""
-    run_id: str = ""
-    results: dict = {}
+def _build_strategy(strategy_id: str, codes: list[str] | None):
+    sid = strategy_id.lower().strip()
+    if sid == "l1":
+        return L1TrendScore(codes=codes)
+    if sid == "l2":
+        return L2MultiFactor(codes=codes)
+    if sid == "l3":
+        return L3MultiFactorRSRS(codes=codes)
+    raise ValueError(f"未知策略: {strategy_id}")
 
 
-@router.get("/strategies")
+def _run_backtest(req: BacktestRequest) -> BacktestResultResponse:
+    codes = req.codes or DEFAULT_ETF_CODES
+    all_codes = list(set(codes) | {req.benchmark_code})
+    if req.strategy.lower() == "l3":
+        all_codes = list(set(all_codes) | {"510300"})
+
+    store = create_data_store()
+    store.ensure(all_codes, req.start_date, req.end_date)
+    ohlcv = store.load(all_codes, req.start_date, req.end_date)
+    if ohlcv.empty:
+        return BacktestResultResponse(
+            strategy=req.strategy,
+            start=req.start_date, end=req.end_date,
+            cost_rate=req.cost_rate,
+            nav=[], benchmark_nav=[],
+            trades=[], signals=[], metrics={},
+            status="error", message="没有可用的历史数据",
+        )
+
+    strategy = _build_strategy(req.strategy, codes)
+    calendar = store.get_trading_calendar(req.start_date, req.end_date)
+    signals = strategy.generate_signals(ohlcv, calendar)
+
+    engine = BacktestEngine(initial_cash=req.initial_cash, cost_rate=req.cost_rate)
+    result = engine.run(signals, ohlcv, benchmark_code=req.benchmark_code)
+
+    nav_points = [
+        NavPoint(date=idx.date() if hasattr(idx, "date") else idx, nav=float(val))
+        for idx, val in result.nav.items()
+    ]
+    bench_points = [
+        NavPoint(date=idx.date() if hasattr(idx, "date") else idx, nav=float(val))
+        for idx, val in result.benchmark_nav.items()
+    ]
+
+    trade_items = [
+        TradeItem(
+            date=t.date, code=t.code, action=t.action,
+            price=float(t.price), shares=int(t.shares),
+            amount=float(t.amount), reason=t.reason,
+        )
+        for t in result.trades
+    ]
+
+    signal_items = [
+        SignalItem(
+            date=s.date, target_codes=list(s.target_codes),
+            reason=s.reason, scores=s.scores or None,
+        )
+        for s in signals
+    ]
+
+    return BacktestResultResponse(
+        strategy=req.strategy,
+        start=result.start, end=result.end,
+        cost_rate=result.cost_rate,
+        nav=nav_points, benchmark_nav=bench_points,
+        trades=trade_items, signals=signal_items,
+        metrics=result.metrics,
+        status="ok",
+    )
+
+
+@router.get("/strategies", response_model=StrategyListResponse)
 def list_strategies():
-    result = []
-    for sid, info in STRATEGY_REGISTRY.items():
-        result.append({"id": sid, "name": info["name"]})
-    return result
-
-
-@router.get("/benchmarks", response_model=BenchmarkListResponse)
-def list_benchmarks():
-    items = [BenchmarkInfo(code=code, name=name) for code, name in BENCHMARK_REGISTRY.items()]
-    return BenchmarkListResponse(benchmarks=items)
+    return StrategyListResponse(
+        strategies=[
+            StrategyInfo(id=k, name=v["name"], description=v["description"], rebalance_freq=v["rebalance_freq"])
+            for k, v in STRATEGY_REGISTRY.items()
+        ]
+    )
 
 
 @router.get("/default-codes")
 def get_default_codes():
-    return DEFAULT_ETF_CODES
+    return {"codes": DEFAULT_ETF_CODES}
 
 
-@router.post("/run", response_model=BacktestRunResponse)
-def run_backtest(req: BacktestRequest):
-    try:
-        start = date.fromisoformat(req.start_date)
-        end = date.fromisoformat(req.end_date)
-    except ValueError as e:
-        return BacktestRunResponse(success=False, message=f"日期格式错误: {e}")
-
-    store = create_data_store()
-    store.ensure(req.codes + [req.benchmark_code], start, end)
-    ohlcv = store.load(req.codes + [req.benchmark_code], start, end)
-
-    if ohlcv.empty:
-        return BacktestRunResponse(success=False, message="无法获取OHLCV数据")
-
-    if isinstance(ohlcv.index, pd.MultiIndex):
-        calendar = sorted(set(ohlcv.index.get_level_values("date")))
-    else:
-        calendar = sorted(set(ohlcv["date"]))
-
-    results = {}
-    for sid in req.strategy_ids:
-        if sid not in STRATEGY_REGISTRY:
-            continue
-        info = STRATEGY_REGISTRY[sid]
-        cls = info["class"]
-
-        if sid == "l3":
-            strategy = cls(codes=req.codes, benchmark_code=req.benchmark_code)
-        else:
-            strategy = cls(codes=req.codes)
-
-        signals = strategy.generate_signals(ohlcv, calendar)
-        engine = BacktestEngine(initial_cash=req.initial_cash, cost_rate=req.cost_rate)
-        result = engine.run(signals, ohlcv, benchmark_code=req.benchmark_code)
-
-        results[sid] = {
-            "strategy_name": info["name"],
-            "metrics": result.metrics,
-            "nav": result.nav.to_dict(),
-            "benchmark_nav": result.benchmark_nav.to_dict(),
-            "trades": result.trades,
-            "signal_count": len(signals),
-        }
-
-    run_id = date.today().strftime("%Y%m%d") + f"_{len(req.strategy_ids)}"
-    run_data = {
-        "run_id": run_id,
-        "params": req.model_dump(),
-        "results": results,
-    }
-
-    run_path = BACKTEST_RUNS_DIR / f"{run_id}.json"
-    try:
-        run_path.write_text(
-            json.dumps(run_data, ensure_ascii=False, indent=2, default=str),
-            encoding="utf-8",
-        )
-    except Exception as e:
-        _log.warning("failed to save backtest run: %s", e)
-
-    return BacktestRunResponse(
-        success=True,
-        message="回测完成",
-        run_id=run_id,
-        results=results,
+@router.get("/benchmarks", response_model=BenchmarkListResponse)
+def list_benchmarks():
+    return BenchmarkListResponse(
+        benchmarks=[
+            BenchmarkInfo(code=code, name=name)
+            for code, name in BENCHMARK_REGISTRY.items()
+        ]
     )
 
 
-import pandas as pd
+@router.post("/run", response_model=BacktestResultResponse)
+def run_backtest(req: BacktestRequest):
+    try:
+        return _run_backtest(req)
+    except ValueError as e:
+        return BacktestResultResponse(
+            strategy=req.strategy,
+            start=req.start_date, end=req.end_date,
+            cost_rate=req.cost_rate,
+            nav=[], benchmark_nav=[],
+            trades=[], signals=[], metrics={},
+            status="error", message=str(e),
+        )
+    except Exception as e:
+        return BacktestResultResponse(
+            strategy=req.strategy,
+            start=req.start_date, end=req.end_date,
+            cost_rate=req.cost_rate,
+            nav=[], benchmark_nav=[],
+            trades=[], signals=[], metrics={},
+            status="error", message=f"回测失败: {e}",
+        )
+
+
+@router.post("/compare")
+def compare_strategies(req: BacktestCompareRequest):
+    results = {}
+    for sid in req.strategies:
+        sub_req = BacktestRequest(
+            strategy=sid, codes=req.codes,
+            start_date=req.start_date, end_date=req.end_date,
+            initial_cash=req.initial_cash, cost_rate=req.cost_rate,
+            benchmark_code=req.benchmark_code,
+        )
+        results[sid] = _run_backtest(sub_req)
+    return {"results": results}

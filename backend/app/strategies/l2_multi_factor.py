@@ -1,127 +1,123 @@
 import pandas as pd
-import numpy as np
-from typing import List, Dict
+from datetime import date
+from app.strategies.base import Strategy, RebalanceSignal
 
-from app.strategies.base import RebalanceSignal
+FACTORS = {
+    "momentum_20d": 0.30,
+    "volume_expand": 0.20,
+    "reversal_30d": 0.15,
+    "valuation_composite": 0.25,
+    "inv_volatility": 0.10,
+}
 
 
-def compute_valuation_composite(
-    closes: pd.Series,
-    lookback: int = 60,
-    dd_lookback: int = 60,
-) -> float:
-    if len(closes) < lookback:
+def compute_valuation_composite(close: pd.Series, lookback: int = 250, dd_lookback: int = 250) -> float:
+    if len(close) < 20:
         return 0.5
-    window = closes.iloc[-lookback:]
-    current = window.iloc[-1]
-    rank = 1.0 - (window < current).sum() / len(window)
-    if dd_lookback > 0 and len(closes) >= dd_lookback:
-        dd_window = closes.iloc[-dd_lookback:]
-        rolling_max = dd_window.cummax()
-        dd = (dd_window - rolling_max) / rolling_max
-        max_dd = dd.min()
-        if max_dd < 0:
-            dd_score = max_dd / (-0.3)
-            dd_score = max(0.0, min(1.0, dd_score))
-        else:
-            dd_score = 0.0
+    window = close.tail(lookback)
+    pct = float(window.rank(pct=True).iloc[-1]) if len(window) >= 20 else 0.5
+    price_pct_component = 1 - pct
+
+    dd_window = close.tail(dd_lookback)
+    if len(dd_window) >= 2:
+        running_max = dd_window.cummax()
+        drawdown = (dd_window - running_max) / running_max
+        max_dd = abs(float(drawdown.min()))
+        dd_inv_component = max_dd
     else:
-        dd_score = 0.5
-    return round(float(rank * 0.6 + dd_score * 0.4), 4)
+        dd_inv_component = 0.0
+
+    return price_pct_component * 0.6 + dd_inv_component * 0.4
 
 
-class L2MultiFactor:
-    name = "l2_multi_factor"
+def _standardize(series: pd.Series) -> pd.Series:
+    std = series.std(ddof=0)
+    if std == 0 or pd.isna(std):
+        return pd.Series(0.0, index=series.index)
+    return (series - series.mean()) / std
 
-    def __init__(
-        self,
-        codes: List[str] = None,
-        top_n: int = 5,
-        m_days: int = 20,
-        lookback: int = 60,
-    ):
-        self.codes = codes or []
+
+class L2MultiFactor(Strategy):
+    """L2: 多因子打分 TOP5。"""
+    name = "L2 多因子 TOP5"
+    rebalance_freq = "monthly"
+
+    def __init__(self, top_n: int = 5, codes: list[str] | None = None):
         self.top_n = top_n
-        self.m_days = m_days
-        self.lookback = lookback
+        self.codes = codes
 
-    def generate_signals(self, ohlcv: pd.DataFrame, calendar: list) -> List[RebalanceSignal]:
-        codes = self.codes if self.codes else self._extract_codes(ohlcv)
-        signals = []
-        monthly_dates = self._monthly_dates(calendar)
+    def _compute_scores(self, ohlcv: pd.DataFrame, d: date) -> dict[str, float]:
+        all_codes = self.codes or sorted({c for _, c in ohlcv.index})
+        per_factor: dict[str, pd.Series] = {f: pd.Series(dtype=float) for f in FACTORS}
 
-        for d in monthly_dates:
-            scores = {}
-            for code in codes:
-                try:
-                    closes = self._get_closes_before(ohlcv, code, d)
-                    if len(closes) < self.m_days:
-                        continue
-                    trend = self._trend_score(closes)
-                    valuation = compute_valuation_composite(closes, self.lookback)
-                    momentum = self._momentum(closes)
-                    composite = trend * 0.4 + valuation * 0.3 + momentum * 0.3
-                    scores[code] = round(composite, 4)
-                except Exception:
-                    continue
-
-            if not scores:
-                continue
-
-            sorted_codes = sorted(scores.keys(), key=lambda c: scores[c], reverse=True)
-            target = sorted_codes[: self.top_n]
-            signals.append(
-                RebalanceSignal(
-                    date=d,
-                    target_codes=target,
-                    reason="l2_multi_factor",
-                    scores={c: scores[c] for c in target},
-                )
-            )
-
-        return signals
-
-    def _extract_codes(self, ohlcv: pd.DataFrame) -> list:
-        if isinstance(ohlcv.index, pd.MultiIndex):
-            return list(set(ohlcv.index.get_level_values("code")))
-        elif "code" in ohlcv.columns:
-            return list(set(ohlcv["code"]))
-        return []
-
-    def _monthly_dates(self, calendar: list) -> list:
-        if not calendar:
-            return []
-        from itertools import groupby
-        result = []
-        for key, group in groupby(calendar, key=lambda d: (d.year, d.month)):
-            dates_in_month = list(group)
-            result.append(dates_in_month[-1])
-        return result
-
-    def _trend_score(self, closes: pd.Series) -> float:
-        if len(closes) < self.m_days:
-            return 0.0
-        recent = closes.iloc[-self.m_days:]
-        x = np.arange(len(recent))
-        y = recent.values
-        if y.std() == 0:
-            return 0.0
-        slope = np.polyfit(x, y, 1)[0]
-        return float(slope / y.mean() * 100)
-
-    def _momentum(self, closes: pd.Series) -> float:
-        if len(closes) < self.m_days:
-            return 0.0
-        return float((closes.iloc[-1] / closes.iloc[-self.m_days] - 1) * 100)
-
-    def _get_closes_before(self, ohlcv: pd.DataFrame, code: str, date) -> pd.Series:
-        if isinstance(ohlcv.index, pd.MultiIndex):
+        for code in all_codes:
             try:
                 sub = ohlcv.xs(code, level="code")
-                sub = sub[sub.index <= date]
-                return sub["close"]
             except KeyError:
-                return pd.Series(dtype=float)
-        else:
-            mask = (ohlcv["code"] == code) & (ohlcv["date"] <= date)
-            return ohlcv.loc[mask, "close"]
+                continue
+            sub.index = pd.DatetimeIndex(pd.to_datetime(sub.index))
+            sub = sub[sub.index <= pd.Timestamp(d)]
+            if len(sub) < 30:
+                continue
+
+            close = sub["close"]
+            volume = sub["volume"]
+
+            mom_20 = (close.iloc[-1] / close.iloc[-20] - 1) if len(close) >= 20 else 0
+            vol_5 = volume.tail(5).mean()
+            vol_20 = volume.tail(20).mean()
+            vol_expand = (vol_5 / vol_20 - 1) if vol_20 > 0 else 0
+            reversal_30 = -(close.iloc[-1] / close.iloc[-30] - 1) if len(close) >= 30 else 0
+            val_comp = compute_valuation_composite(close)
+            vol_20d = close.pct_change().tail(20).std(ddof=0)
+            inv_vol = 1.0 / (vol_20d + 1e-6) if vol_20d > 0 else 0
+
+            for fname, val in [
+                ("momentum_20d", mom_20),
+                ("volume_expand", vol_expand),
+                ("reversal_30d", reversal_30),
+                ("valuation_composite", val_comp),
+                ("inv_volatility", inv_vol),
+            ]:
+                per_factor[fname][code] = float(val)
+
+        all_codes_set = set().union(*[s.index for s in per_factor.values()]) if per_factor else set()
+        final: dict[str, float] = {}
+        for code in all_codes_set:
+            weighted = 0.0
+            for fname, w in FACTORS.items():
+                s = per_factor[fname]
+                if code in s.index:
+                    z = float(_standardize(s).get(code, 0.0) or 0.0)
+                    weighted += z * w
+            final[code] = weighted
+        return final
+
+    def generate_signals(self, ohlcv, calendar):
+        all_dates = sorted({d for d, _ in ohlcv.index})
+        if not all_dates:
+            return []
+        monthly_first: list[date] = []
+        last_month = None
+        for d in all_dates:
+            ym = (d.year, d.month)
+            if ym != last_month:
+                monthly_first.append(d)
+                last_month = ym
+
+        signals: list[RebalanceSignal] = []
+        current: set[str] = set()
+        for d in monthly_first:
+            scores = self._compute_scores(ohlcv, d)
+            if not scores:
+                continue
+            top = sorted(scores, key=scores.get, reverse=True)[: self.top_n]
+            top_set = set(top)
+            if top_set != current:
+                current = top_set
+                signals.append(RebalanceSignal(
+                    date=d, target_codes=top,
+                    reason=f"多因子 TOP{self.top_n}",
+                    scores=scores,
+                ))
+        return signals

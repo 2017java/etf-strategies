@@ -1,19 +1,19 @@
 from dataclasses import dataclass, field
-from typing import Dict, List
-from abc import ABC, abstractmethod
-
+from datetime import date
+from typing import Protocol, runtime_checkable, Literal
 
 @dataclass
 class RebalanceSignal:
-    date: object
-    target_codes: List[str]
-    reason: str = ""
-    scores: Dict[str, float] = field(default_factory=dict)
+    date: date
+    target_codes: list[str]
+    reason: str
+    scores: dict[str, float] = field(default_factory=dict)
 
-
-class Strategy(ABC):
+@runtime_checkable
+class Strategy(Protocol):
     name: str = ""
+    rebalance_freq: Literal["daily", "weekly", "monthly"]
 
-    @abstractmethod
-    def generate_signals(self, ohlcv, calendar: list) -> List[RebalanceSignal]:
-        ...
+    def generate_signals(
+        self, ohlcv: "pd.DataFrame", calendar: list[date]
+    ) -> list[RebalanceSignal]: ...

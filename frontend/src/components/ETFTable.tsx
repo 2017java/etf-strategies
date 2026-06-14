@@ -22,7 +22,7 @@ function ChangeCell({ value }: { value: number }) {
   );
 }
 
-export default function ETFTable({ data }: { data: ETFItem[] }) {
+export default function ETFTable({ data, onEtfClick }: { data: ETFItem[]; onEtfClick?: (etf: ETFItem) => void }) {
   const [categoryFilter, setCategoryFilter] = useState<string>('全部');
   const [sortKey, setSortKey] = useState<SortKey>('composite_score');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
@@ -83,29 +83,31 @@ export default function ETFTable({ data }: { data: ETFItem[] }) {
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-slate-50 text-slate-500 text-left">
-              <th className="px-5 py-3 font-medium">代码</th>
-              <th className="px-5 py-3 font-medium">名称</th>
-              <th className="px-5 py-3 font-medium">类别</th>
-              <th className="px-5 py-3 font-medium text-right">当前价</th>
-              <th className="px-5 py-3 font-medium text-right cursor-pointer select-none" onClick={() => handleSort('current_change_pct')}>
+              <th className="px-3 sm:px-5 py-3 font-medium whitespace-nowrap">代码</th>
+              <th className="px-3 sm:px-5 py-3 font-medium whitespace-nowrap">名称</th>
+              <th className="px-3 sm:px-5 py-3 font-medium whitespace-nowrap hidden sm:table-cell">类别</th>
+              <th className="px-3 sm:px-5 py-3 font-medium text-right whitespace-nowrap">当前价</th>
+              <th className="px-3 sm:px-5 py-3 font-medium text-right cursor-pointer select-none whitespace-nowrap" onClick={() => handleSort('current_change_pct')}>
                 <span className="inline-flex items-center gap-1">涨跌幅 <SortIcon target="current_change_pct" /></span>
               </th>
-              <th className="px-5 py-3 font-medium text-right cursor-pointer select-none" onClick={() => handleSort('two_day_change_pct')}>
+              <th className="px-3 sm:px-5 py-3 font-medium text-right cursor-pointer select-none whitespace-nowrap hidden md:table-cell" onClick={() => handleSort('two_day_change_pct')}>
                 <span className="inline-flex items-center gap-1">两日累计涨幅 <SortIcon target="two_day_change_pct" /></span>
               </th>
-              <th className="px-5 py-3 font-medium text-right cursor-pointer select-none" onClick={() => handleSort('volume_expand_pct')}>
+              <th className="px-3 sm:px-5 py-3 font-medium text-right cursor-pointer select-none whitespace-nowrap hidden md:table-cell" onClick={() => handleSort('volume_expand_pct')}>
                 <span className="inline-flex items-center gap-1">成交量放大 <SortIcon target="volume_expand_pct" /></span>
               </th>
-              <th className="px-5 py-3 font-medium text-right cursor-pointer select-none" onClick={() => handleSort('change_30d')}>
+              <th className="px-3 sm:px-5 py-3 font-medium text-right cursor-pointer select-none whitespace-nowrap hidden lg:table-cell" onClick={() => handleSort('change_30d')}>
                 <span className="inline-flex items-center gap-1">30日涨跌幅 <SortIcon target="change_30d" /></span>
               </th>
-              <th className="px-5 py-3 font-medium text-right cursor-pointer select-none" onClick={() => handleSort('change_30d_score')}>
+              <th className="px-3 sm:px-5 py-3 font-medium text-right cursor-pointer select-none whitespace-nowrap hidden lg:table-cell" onClick={() => handleSort('change_30d_score')}>
                 <span className="inline-flex items-center gap-1">30日标准分 <SortIcon target="change_30d_score" /></span>
               </th>
-              <th className="px-5 py-3 font-medium text-right cursor-pointer select-none" onClick={() => handleSort('composite_score')}>
+              <th className="px-3 sm:px-5 py-3 font-medium text-right cursor-pointer select-none whitespace-nowrap" onClick={() => handleSort('composite_score')}>
                 <span className="inline-flex items-center gap-1">综合得分 <SortIcon target="composite_score" /></span>
               </th>
-              <th className="px-5 py-3 font-medium text-right">成交量</th>
+              <th className="px-3 sm:px-5 py-3 font-medium text-right cursor-pointer select-none whitespace-nowrap hidden md:table-cell" onClick={() => handleSort('volume')}>
+                <span className="inline-flex items-center gap-1">成交量 <SortIcon target="volume" /></span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -114,21 +116,29 @@ export default function ETFTable({ data }: { data: ETFItem[] }) {
                 key={item.code}
                 className={`border-b border-slate-50 hover:bg-primary-50/30 transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/40'}`}
               >
-                <td className="px-5 py-3 font-mono text-slate-700">{item.code}</td>
-                <td className="px-5 py-3 font-medium text-slate-800">{item.name}</td>
-                <td className="px-5 py-3">
+                <td className="px-3 sm:px-5 py-3 font-mono text-slate-700 whitespace-nowrap">
+                  {onEtfClick ? (
+                    <button onClick={() => onEtfClick(item)} className="hover:text-primary-600 hover:underline">{item.code}</button>
+                  ) : item.code}
+                </td>
+                <td className="px-3 sm:px-5 py-3 font-medium text-slate-800 whitespace-nowrap">
+                  {onEtfClick ? (
+                    <button onClick={() => onEtfClick(item)} className="hover:text-primary-600 hover:underline">{item.name}</button>
+                  ) : item.name}
+                </td>
+                <td className="px-3 sm:px-5 py-3 hidden sm:table-cell">
                   <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
                     item.category === '宽基ETF' ? 'bg-blue-50 text-blue-700' : 'bg-teal-50 text-teal-700'
                   }`}>
                     {item.category}
                   </span>
                 </td>
-                <td className="px-5 py-3 text-right font-mono text-slate-700">{item.current_price.toFixed(3)}</td>
-                <td className="px-5 py-3 text-right"><ChangeCell value={item.current_change_pct} /></td>
-                <td className="px-5 py-3 text-right"><ChangeCell value={item.two_day_change_pct} /></td>
-                <td className="px-5 py-3 text-right"><ChangeCell value={item.volume_expand_pct} /></td>
-                <td className="px-5 py-3 text-right">{item.change_30d != null ? <ChangeCell value={item.change_30d} /> : <span className="text-slate-300">-</span>}</td>
-                <td className="px-5 py-3 text-right">
+                <td className="px-3 sm:px-5 py-3 text-right font-mono text-slate-700 whitespace-nowrap">{item.current_price.toFixed(3)}</td>
+                <td className="px-3 sm:px-5 py-3 text-right"><ChangeCell value={item.current_change_pct} /></td>
+                <td className="px-3 sm:px-5 py-3 text-right hidden md:table-cell"><ChangeCell value={item.two_day_change_pct} /></td>
+                <td className="px-3 sm:px-5 py-3 text-right hidden md:table-cell"><ChangeCell value={item.volume_expand_pct} /></td>
+                <td className="px-3 sm:px-5 py-3 text-right hidden lg:table-cell">{item.change_30d != null ? <ChangeCell value={item.change_30d} /> : <span className="text-slate-300">-</span>}</td>
+                <td className="px-3 sm:px-5 py-3 text-right hidden lg:table-cell">
                   {item.change_30d_score != null ? (
                     <span className={`font-semibold ${item.change_30d_score >= 25 ? 'text-orange-600' : item.change_30d_score >= 10 ? 'text-amber-600' : 'text-slate-500'}`}>
                       +{item.change_30d_score.toFixed(1)}
@@ -137,12 +147,12 @@ export default function ETFTable({ data }: { data: ETFItem[] }) {
                     <span className="text-slate-300">-</span>
                   )}
                 </td>
-                <td className="px-5 py-3 text-right">
+                <td className="px-3 sm:px-5 py-3 text-right">
                   <span className={`font-semibold ${item.composite_score > 0 ? 'text-rise' : item.composite_score < 0 ? 'text-fall' : 'text-slate-400'}`}>
                     {item.composite_score > 0 ? '+' : ''}{item.composite_score.toFixed(2)}
                   </span>
                 </td>
-                <td className="px-5 py-3 text-right text-slate-500">{formatVolume(item.volume)}</td>
+                <td className="px-3 sm:px-5 py-3 text-right text-slate-500 whitespace-nowrap hidden md:table-cell">{formatVolume(item.volume)}</td>
               </tr>
             ))}
           </tbody>

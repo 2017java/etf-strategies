@@ -1,108 +1,97 @@
-import logging
-from datetime import date, timedelta
-from pathlib import Path
-
-import akshare as ak
+"""OHLCV parquet 缓存模块。
+注意：save() 是 read-modify-write 模式，**单进程写**才安全，多 worker 并发写同一 code 会丢数据。
+"""
 import pandas as pd
+from pathlib import Path
+from datetime import date, timedelta
+from typing import Iterable
+import logging
+import akshare as ak
 
-from app.config import OHLCV_DIR
-
-_log = logging.getLogger("app.data_store")
-
+logger = logging.getLogger(__name__)
 
 class OHLCVStore:
-    def __init__(self, root: Path = OHLCV_DIR):
+    """按 code 分文件的 parquet 缓存，交易日历粗略过滤（剔除周末）。"""
+
+    def __init__(self, root: Path | str | None = None):
+        if root is None:
+            root = Path(__file__).resolve().parent.parent / "data" / "ohlcv"
         self.root = Path(root)
         self.root.mkdir(parents=True, exist_ok=True)
 
-    def load(self, codes: list[str], start: date, end: date) -> pd.DataFrame:
-        frames = []
-        for code in codes:
-            path = self.root / f"{code}.parquet"
-            if not path.exists():
-                continue
-            try:
-                df = pd.read_parquet(path)
-            except Exception:
-                _log.warning("corrupted parquet for %s, skipping", code)
-                continue
-            if "code" not in df.columns and df.index.name == "code":
-                df = df.reset_index()
-            if "date" in df.columns:
-                df["date"] = pd.to_datetime(df["date"]).dt.date
-                df = df[(df["date"] >= start) & (df["date"] <= end)]
-            if "code" not in df.columns:
-                df["code"] = code
-            frames.append(df)
+    def _file(self, code: str) -> Path:
+        return self.root / f"{code}.parquet"
 
-        if not frames:
-            return pd.DataFrame(
-                columns=["date", "code", "open", "high", "low", "close", "volume"]
-            ).set_index(["date", "code"])
-
-        result = pd.concat(frames, ignore_index=True)
-        result = result.set_index(["date", "code"]).sort_index()
-        return result
-
-    def save(self, df: pd.DataFrame):
+    def save(self, df: pd.DataFrame) -> None:
         if df.empty:
             return
-        if isinstance(df.index, pd.MultiIndex):
-            df = df.reset_index()
-        if "code" not in df.columns:
-            return
-        for code, group in df.groupby("code"):
-            group = group.drop(columns=["code"]).reset_index(drop=True)
-            path = self.root / f"{code}.parquet"
-            if path.exists():
-                try:
-                    existing = pd.read_parquet(path)
-                    if "date" in existing.columns and "date" in group.columns:
-                        existing["date"] = pd.to_datetime(existing["date"])
-                        group["date"] = pd.to_datetime(group["date"])
-                        merged = pd.concat([existing, group]).drop_duplicates(
-                            subset=["date"], keep="last"
-                        ).sort_values("date").reset_index(drop=True)
-                        merged.to_parquet(path, index=False)
-                        continue
-                except Exception:
-                    pass
-            group.to_parquet(path, index=False)
+        for code, sub in df.groupby(level="code"):
+            sub = sub.droplevel("code").sort_index()
+            f = self._file(str(code))
+            if f.exists():
+                old = pd.read_parquet(f)
+                merged = pd.concat([old, sub])
+                merged = merged[~merged.index.duplicated(keep="last")].sort_index()
+                merged.to_parquet(f)
+            else:
+                sub.to_parquet(f)
 
-    def ensure(self, codes: list[str], start: date, end: date):
+    def load(self, codes: Iterable[str], start: date, end: date) -> pd.DataFrame:
+        frames = []
         for code in codes:
-            path = self.root / f"{code}.parquet"
-            need_fetch = True
-            if path.exists():
-                try:
-                    df = pd.read_parquet(path)
-                    if "date" in df.columns:
-                        df["date"] = pd.to_datetime(df["date"]).dt.date
-                        trading_days = self.get_trading_calendar(start, end)
-                        covered = set(df["date"])
-                        coverage = len(trading_days & covered) / max(len(trading_days), 1)
-                        if coverage >= 0.95:
-                            need_fetch = False
-                except Exception:
-                    pass
+            f = self._file(str(code))
+            if not f.exists():
+                continue
+            try:
+                sub = pd.read_parquet(f)
+            except Exception as e:
+                logger.warning("load() skip corrupted %s: %s", code, e)
+                continue
+            sub.index = pd.to_datetime(sub.index).date
+            sub = sub.loc[(sub.index >= start) & (sub.index <= end)]
+            if sub.empty:
+                continue
+            sub.index = pd.MultiIndex.from_product(
+                [sub.index, [str(code)]], names=["date", "code"]
+            )
+            frames.append(sub)
+        if not frames:
+            idx = pd.MultiIndex.from_arrays([[], []], names=["date", "code"])
+            return pd.DataFrame(columns=["open", "high", "low", "close", "volume"], index=idx)
+        return pd.concat(frames).sort_index()
 
-            if need_fetch:
-                try:
-                    raw = ak.fund_etf_hist_sina(symbol=code)
-                    if raw is not None and not raw.empty:
-                        raw["code"] = code
-                        if "date" in raw.columns:
-                            raw["date"] = pd.to_datetime(raw["date"]).dt.date
-                        self.save(raw)
-                        _log.info("fetched and cached OHLCV for %s", code)
-                except Exception as e:
-                    _log.warning("failed to fetch OHLCV for %s: %s", code, e)
-
-    def get_trading_calendar(self, start: date, end: date) -> set:
-        days = set()
-        current = start
-        while current <= end:
-            if current.weekday() < 5:
-                days.add(current)
-            current += timedelta(days=1)
+    def get_trading_calendar(self, start: date, end: date) -> list[date]:
+        days = []
+        d = start
+        while d <= end:
+            if d.weekday() < 5:
+                days.append(d)
+            d += timedelta(days=1)
         return days
+
+    def ensure(self, codes: Iterable[str], start: date, end: date) -> None:
+        for code in codes:
+            f = self._file(str(code))
+            if f.exists():
+                existing = pd.read_parquet(f)
+                existing.index = pd.to_datetime(existing.index).date
+                if start in existing.index and end in existing.index:
+                    continue
+            prefix = "sh" if code.startswith(("5", "6")) else "sz"
+            try:
+                df = ak.fund_etf_hist_sina(symbol=f"{prefix}{code}")
+            except Exception as e:
+                logger.warning("akshare failed for %s: %s", code, e)
+                continue
+            if df is None or df.empty:
+                continue
+            df["date"] = pd.to_datetime(df["date"]).dt.date
+            df = df[(df["date"] >= start) & (df["date"] <= end)]
+            if df.empty:
+                continue
+            df = df.set_index("date")[["open", "high", "low", "close", "volume"]]
+            multi = df.copy()
+            multi.index = pd.MultiIndex.from_product(
+                [df.index, [str(code)]], names=["date", "code"]
+            )
+            self.save(multi)

@@ -12,6 +12,8 @@ from app.llm_recommender import get_llm_recommendations
 from app.models import DashboardData, ETFItem, QuantRecommend, LLMRecommend, RefreshResponse
 from app import sim_routes
 from app import backtest_routes
+from app import kline_routes
+from app import progress
 
 app = FastAPI(title="ETF操盘看板API", version="2.0.0")
 
@@ -102,6 +104,12 @@ def get_dashboard(use_cache: bool = True):
     return refresh_data()
 
 
+@app.get("/api/dashboard/progress")
+def get_dashboard_progress():
+    """返回当前后台数据加载的实时进度（供前端轮询）"""
+    return progress.snapshot()
+
+
 # ── 模拟盘接口 ────────────────────────────────────────────
 
 @app.get("/api/sim/portfolio")
@@ -169,3 +177,6 @@ def sim_update_initial_cash_patch(req: sim_routes.UpdateInitialCashRequest):
 
 # ── 回测接口 ────────────────────────────────────────────
 app.include_router(backtest_routes.router)
+
+# ── K线接口 ────────────────────────────────────────────
+app.include_router(kline_routes.router)

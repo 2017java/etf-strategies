@@ -345,3 +345,231 @@ LLM_MODEL=deepseek-v4-pro
 - **git 操作前先确认 `git rev-parse --show-toplevel`**——避免误操作到父级仓库
 - **node_modules 二进制文件锁**——Windows 上 `git checkout` 涉及 node_modules 中的 .exe/.node 文件时会卡住，应用 `git commit-tree` 绕过 checkout
 
+---
+
+## [AUDIT] 完整代码审查 + 原始提交对比 — 2026-06-12
+
+### 找到 v2.1 前原始完整提交 `28f78de`
+- 提交信息：`fix: 修复后端启动ImportError + 恢复启动脚本清理能力`
+- 来源：用户从回收站恢复的两个 `.git` 压缩包（`git1308.zip` 和 `git1247.zip`）
+- 位置：解压后 `_git1247/$RX3BTPR.git/`，访问方式 `git --git-dir='_git1247/$RX3BTPR.git' show 28f78de:<path>`
+- ⚠️ 此提交**不在**当前独立仓库的历史中，也不在父级 AICoding 仓库中，只在回收站恢复的 `.git` 中
+
+### `28f78de` vs 当前 HEAD 对比结果
+
+#### ✅ 完全一致（17 个文件）— 恢复正确，无需修复
+- backend/app/main.py, sim_routes.py, run.py, requirements.txt
+- frontend/src/App.tsx, DashboardContext.tsx, main.tsx, index.css
+- frontend/src/components/Dashboard.tsx, ETFTable.tsx, QuantRanking.tsx, SimPortfolio.tsx
+- frontend/vite.config.ts, start-dashboard.ps1, .gitignore
+- frontend/src/types.ts（仅新增 KlinePoint/KlineResponse）
+- frontend/src/api.ts（仅新增 getEtfKline）
+
+#### 🔴 有差异（17 个文件）— 重建时被简化/重写，与原始版差异显著
+- 后端核心（9个）：calculator.py（-155/+83）、backtest_routes.py（-195/+104）、models.py（-102/+36）、data_fetcher.py（-315/+134）、data_store.py（-80/+91）、datasource.py（-50/+8）、llm_recommender.py（-211/+114）、config.py（-70/+61）、tushare_store.py（-118/+62）
+- 后端策略（5个）：engine.py（-97/+160）、metrics.py（-31/+36）、base.py（-12/+12）、l1_trend_score.py（-50/+75）、l2_multi_factor.py（-106/+110）、l3_multi_factor_rsrs.py（-147/+141）
+- 后端其他：sim_portfolio.py（-62/+58）
+- 前端组件（3个）：BacktestRunner.tsx（-312/+234）、BacktestCompare.tsx（-275/+223）、LLMRecommend.tsx（-39/+46）
+
+### 前端审查发现的 12 个 CRITICAL 问题
+1. `types.ts` ETFItem 有 8 个后端不存在的字段
+2. `QuantRecommend`/`LLMRecommend` 定义 rank（必填），后端无此字段
+3. `BacktestResult` 与后端响应格式完全不同（前端期望数组，后端返回日期→值映射）
+4. `listStrategies()` 期望 `{strategies: [...]}`，后端返回 `[...]`
+5. `getDefaultCodes()` 期望 `{codes: [...]}`，后端返回 `[...]`
+6. `runBacktest` 发 `strategy`，后端期望 `strategy_ids`
+7. `compareStrategies` 调用不存在的 `POST /api/backtest/compare`
+8. `getEtfKline` URL/参数/响应格式全错
+9. `kline_routes.py` 未在 main.py 注册
+10. `chartData` 构建假设 nav 是数组，后端返回对象
+11. 错误检查用 `res.status`，后端返回 `success`
+12. 同上 7
+
+### 功能可用性
+- 实时行情看板：⚠️ 降级（缺分类、高级指标）
+- AI 推荐 TOP5：⚠️ 降级（rank 异常、刷新不可用）
+- 模拟盘：✅ 基本可用
+- 策略回测：❌ 完全不可用（响应格式不匹配）
+- 策略对比：❌ 完全不可用（API 不存在）
+- ETF K 线详情：❌ 完全不可用（路由未注册）
+
+### 待决策：三种修复策略 → **已选策略1：恢复原始版**
+
+---
+
+## [RESTORE] 28f78de 原始代码恢复 + v2.1 合并 — 2026-06-12
+
+### 已完成
+- 创建 `fix/restore-28f78de` 分支 (commit `ba4abb4b`)，从 `_git1247/$RX3BTPR.git` 的 `28f78de` 提取 18 个差异文件覆盖当前版本
+- 后端 16 个文件恢复：calculator, backtest_routes, models, data_fetcher, data_store, datasource, llm_recommender, config, tushare_store, backtest/engine, backtest/metrics, strategies/{base,l1,l2,l3}, sim_portfolio
+- 前端 3 个文件恢复：BacktestRunner, BacktestCompare, LLMRecommend
+- v2.1 合并：main.py 注册 kline_routes、kline_routes 响应格式改为 `{code,name,kline}`、api.ts getEtfKline URL 修正、Dashboard selectedEtf+ETFDetail、ETFTable/QuantRanking/LLMRecommend onEtfClick
+- .gitignore 添加 `_git1247/`, `_git1308/`, `SESSION_HANDOFF_*.md`
+- 验证通过：pytest 37/37、npm build 0 error、app import OK
+
+### 决策
+- 选策略1（恢复原始版覆盖+合并v2.1增量）而非策略2/3，因为重建版12个CRITICAL问题说明与后端严重脱节
+- kline 路由保持后端 `/api/kline/{code}` RESTful 格式，改前端对齐
+- onEtfClick 类型转换：QuantRanking/LLMRecommend 通过 `etf_list.find()` 转为 ETFItem
+
+### 仍未解决
+- **用户尚未手动测试功能**：需启动项目验证 6 大模块（行情/AI推荐/回测/对比/ETF详情/模拟盘）
+- **尚未合并到 main**：等用户确认测试通过
+- v2.1 遗留功能：SimPortfolio onEtfClick、BatchBuyModal 均分/自定义、PositionEditModal ETF 搜索
+- Git 仓库解耦：ETF 和父级 AICoding 共享远程 `zhitu.git`，push 会冲突
+
+### 风险
+- `fix/restore-28f78de` 分支的 git ref 有 fsmonitor 写入问题，已手动修复 `.git/refs/heads/fix/restore-28f78de`，后续操作仍需 `git -c core.fsmonitor=false`
+- `_git1247/` 和 `_git1308/` 是回收站恢复的 .git 目录，**不要删除**
+
+### 建议先读
+- `implementation-notes.md` — 本次恢复的决策日志（D10-D14）和修改实录（M7-M15）
+- `SESSION_HANDOFF_2026-06-12.md` — 一次性交接文件
+
+### 推荐下一步
+1. 用户启动项目测试（双击 start.bat）
+2. 确认后合并 fix/restore-28f78de → main
+3. 补充 v2.1 遗留功能
+4. Git 仓库解耦
+
+---
+
+## [ITERATION] v2.1 二次迭代 — 2026-06-12
+
+### 分支信息
+- 分支名：`feat-v2.1-iter2-ui-and-perf`（注：本想用 `feat/v2.1-iter2-ui-and-perf` 但 Windows 文件系统拒绝 ref 名含 `/`）
+- 基线 commit：`87b7fd20`（root commit，74 files）
+- 状态：**全部 commit 完成 + 经历 3 轮 hotfix 已稳定**，等待用户最终验收
+- 最新 commit：`3417568b`
+
+### 用户提出的 6 大问题 + 4 大质量问题
+| # | 问题 | Commit | 状态 |
+|---|---|---|---|
+| 1 | 评分排行榜 14 寸出格 | c0e04641 + 3417568b（hotfix）| ✅ 评分用 absolute 定位独立于内容流 |
+| 2 | ETFTable 缺成交量排序 | 15cf8ebe | ✅ |
+| 3 | 启动加载 1 分钟+ | 1699982b + 2ce816db + 32b9fe08 + 38afac57（hotfix）| ✅ 8-15s 首启 / 1-3s 二次 |
+| 4 | ETFTable 表头乱（11 列）| c0e04641 | ✅ 列断点隐藏 + nowrap |
+| 5a | 批量买入金额自定义 | 2df39689 + 3417568b（hotfix）| ✅ 输入框失焦 bug 已修 |
+| 5b | 新增持仓 ETF 弹窗 | 2df39689 + 3417568b（hotfix）| ✅ 持仓均价默认当前市价 |
+| 6 | 日期选择器点击范围 | aa92bcea | ✅ |
+| +1 | 数据加载无进度反馈 | 2ce816db + 3417568b（hotfix）| ✅ 进度条不再超 43 |
+| +2 | akshare 三次调用合并 | 1699982b | ✅ 省 86 次 HTTP |
+| +3 | 缓存持久化 | 32b9fe08 | ✅ parquet + 7 天 LRU |
+| +4 | 量化公式注释去歧义 | e8d6fff0 | ✅ |
+
+### Commit 时间线（13 个 commits）
+```
+3417568b fix: 进度条超总数 + 评分定位 + 输入框失焦 + 持仓均价默认当前市价
+38afac57 fix(backend): main 缺 progress import + 移除 EM 路径避免 V8 多线程崩溃
+1d7b017d fix(ui): 补上 ProgressBar import + portfolio.available_cash 属性误调用
+4e6f24af docs: 实施笔记汇总
+e8d6fff0 docs: 量化公式注释去歧义
+2df39689 feat(sim): 批量买入 + ETF 弹窗
+32b9fe08 perf(data): parquet 缓存
+2ce816db perf(data): 并发 + 进度条
+1699982b perf(data): 三次调用合并
+c0e04641 fix(ui): 响应式适配
+15cf8ebe feat(ui): 成交量排序
+aa92bcea fix(ui): 日期选择器
+87b7fd20 chore: baseline
+```
+
+### 关键决策（D12-D18）
+- **D12** 任务拆 9 commit 串行（UI → 性能 → 新功能 → 文档）
+- **D13** SimPortfolio.tsx 以 v2.1 重建版为准（用户原话"已包含我要他迭代的功能"）
+- **D14** 并发度 15（sina 不封 IP 的安全上限）
+- **D15** 缓存选 parquet 方案 B（用户拍板）
+- **D16** ETFDetail 接口契约只验证不重构
+- **D17** batch_buy 三模式：固定份额/自定义金额/均分（向下兼容）
+- **D18** PositionEditModal 加 ETF 选择弹窗（保留手输 fallback）
+
+### 三轮 Hotfix 修复（实战暴露的真实 bug）
+
+#### Hotfix 1（commit `1d7b017d`）— 启动白屏
+- Dashboard.tsx 缺 `import ProgressBar from "./ProgressBar"`，运行时 ReferenceError
+- SimPortfolio.tsx `portfolio?.available_cash()` 把属性当方法调用
+- **教训**：SearchReplace 在 import 块上的修改可能静默匹配失败，必须用 `npm run build`（不是只用 `tsc --noEmit`）验证
+
+#### Hotfix 2（commit `38afac57`）— 启动 500
+- main.py 缺 `from app import progress` import → `/api/dashboard/progress` NameError → FastAPI 500
+- **重大根因**：`ak.fund_etf_hist_em` / `ak.fund_etf_hist_min_em` 走东方财富，akshare 内部调用 py_mini_racer 启动 V8 解析 JS 加密参数。**多线程并发场景下 V8 PartitionAlloc 全局对象竞态崩溃整个 Python 进程**（`[FATAL] Check failed: !IsConfigurablePoolInitialized()`）
+- 修复：移除 `fetch_30d_change` 的 EM 方案 1 + 方案 3，只保留 sina（纯 HTTP，多线程安全）
+- **教训**：并发改造时必须确认每个底层调用是**多线程安全**的。pytest 37 个 test 用 mock 数据，覆盖不到 akshare 真实调用
+
+#### Hotfix 3（commit `3417568b`）— 用户验收 4 个 UI/UX bug
+1. **进度条 89/43 超总数** → `progress.tick(phase=...)` 同时 +1 计数。修复：新增 `set_phase()` 只改 phase 不计数；前端 `safeDone = Math.min(done, total)` 防御
+2. **评分排行榜评分仍出框** → commit 3 的卡片布局 SearchReplace 静默失败没生效。修复：评分用 `absolute top-4 right-4` 独立定位，卡片加 `pr-28 sm:pr-32` 留空间
+3. **自定义金额输入框只能输 1 个数字** → `EtfCheckbox` 嵌套在 `BatchBuyModal` 函数体内，每次 setState 重新创建函数引用 → React 卸载重挂载 → input 失焦。修复：改成 `renderEtfOption` 普通渲染函数；amount 状态从 `Record<string, number>` 改为 `Record<string, string>`
+4. **持仓份额"0100" + 持仓均价为何要手输** → 初始值 `0` + `type="number"` 拼接异常；持仓均价是有意义字段（历史持仓 ≠ 当前价）但默认值应为 current_price。修复：初始值改 `""`；input 改 `type="text" inputMode="numeric"` + 正则过滤；选 ETF 时 `handlePick` 自动填 avg_cost
+
+### 性能指标
+- **首次启动**：60-120s → **8-15s**（并发 15 + sina 缓存合并）
+- **二次启动**：60-120s → **1-3s**（命中 parquet）
+- **HTTP 调用减少**：43 ETF × 5-8 次/ETF（215-343 次）→ 43 ETF × 2-3 次/ETF（86-129 次）
+
+### 新增/修改文件统计
+- **新增 4 个**：`backend/app/progress.py`、`frontend/src/components/ProgressBar.tsx`、`implementation-notes-2026-06-12.md`、`backend/data/ohlcv_cache/*.parquet`（运行时生成）
+- **修改 11 个**：data_fetcher.py、main.py、api.ts、DashboardContext.tsx、Dashboard.tsx、QuantRanking.tsx、ETFTable.tsx、BacktestRunner.tsx、BacktestCompare.tsx、SimPortfolio.tsx、sim_routes.py
+- **总行数变动**：+700 / -200（含 hotfix）
+
+### 验证结果
+- 后端 pytest：**37/37 passed** ✅（每轮 hotfix 后跑）
+- 前端 `npm run build`：**0 error** ✅
+- 实战 `python run.py`：43 ETF 全部成功加载 + LLM 5 条推荐 ✅
+- `/api/dashboard/progress`：返回正常 JSON ✅
+
+### ETFDetail ↔ SimPortfolio 接口契约
+- **触发方式**：SimPortfolio 持仓行点击 → `onEtfClick(code)` → `<ETFDetail code={code} />`
+- **EtfPickerModal 调用契约**：入参 `allEtfs` 来自 `data.etf_list`；出参 `{ code, name, current_price }`；z-index=60（在 PositionEditModal z-50 之上）
+- **持仓均价自动填**：`handlePick` 检查 `form.avg_cost` 为空时自动用 `current_price` 填入
+
+### 沉淀经验（这次刻碑 ×3）
+
+#### E1：SearchReplace 静默匹配失败 → 必须用完整 build 验证
+- `tsc --noEmit` 在某些 vite/tsconfig 配置下会**跳过 import 错误检测**
+- **以后回归必须用 `npm run build`**，不能只用 `tsc --noEmit`
+- 多个 SearchReplace 后必须 grep 确认改动是否真的生效
+
+#### E2：并发改造前必须确认底层多线程安全
+- akshare 部分接口（EM 系列）走 py_mini_racer V8 解析 JS 反爬代码
+- V8 PartitionAlloc 全局对象在多线程并发场景**直接崩溃整个 Python 进程**
+- 凡是改成 ThreadPoolExecutor 的代码，必须先实测 50+ 次连续并发调用确认稳定
+- 安全做法：sina HTTP 接口纯 requests，多线程安全；EM 系列在并发场景下**必须禁用**
+
+#### E3：嵌套函数组件 = 失焦元凶
+- React 中"在父函数体内定义子组件"= 每次重渲染创建**新函数引用** = React 认为是不同组件 = 卸载重挂载 = input 失焦
+- 修复：把子组件**提取到模块顶层**，或改成"渲染函数"（返回 JSX 但不是组件）
+- 类型签名：`function renderXxx(...): JSX.Element` ✅，不要写成 `function Xxx(): JSX.Element` 然后嵌套使用
+
+#### E4：number input 状态用 string 维护
+- `type="number"` 在浏览器各版本行为不一致（前导零、空字符串变 NaN、step 边界）
+- 改用 `type="text" inputMode="numeric"` + 正则过滤 `value.replace(/[^\d]/g, "")`，状态用 string
+- 提交时再 `parseFloat` 转 number
+
+### 用户验收建议
+详见 `implementation-notes-2026-06-12.md` 文件。验收清单（按 commit 顺序）：
+1. ETFTable 成交量列点击排序
+2. 日期选择器点击空白处弹日历
+3. 14 寸响应式（1366×768 + 640px）
+4. 启动时间 + 进度条
+5. 二次启动 1-3s
+6. 模拟盘批量买入均分/自定义金额（连续输数字）
+7. 模拟盘新增持仓 ETF 弹窗（选 ETF 后均价自动填）
+
+### 已知遗留（未来一轮做）
+- **batch_buy 三模式 amount 字段未在 pytest 覆盖**（37 个 test 只测了 sim_portfolio.py 单股操作）
+- **ProgressBar 在首次 cold start 时 phase='init' 会闪 0/43 几帧**（视觉，不影响功能）
+- **parquet 落盘在 15 worker 并发场景下走串行 OHLCVStore.save()**（理论 1-2s 延迟）
+
+### 风险
+- 用户启动 start.bat 后**第一次**会重新拉数据（如果 parquet 缓存被清空）耗时 8-15s
+- EM 路径已禁用，30 日涨跌幅完全依赖 sina；如果 sina 接口宕机，30d_change 字段会全部为 None（综合得分会少 30 日标准分加权项）
+- v2.1 二次迭代分支仍未合并到 main；建议用户验收通过后 merge
+
+### 推荐下一步
+1. 用户最终验收 7 大功能（按上面清单）
+2. 确认通过后合并 `feat-v2.1-iter2-ui-and-perf` → `main`
+3. 补充 batch_buy amount 字段的 pytest 覆盖
+4. 评估是否需要为 sina 30d_change 加备用源（避免单点失败）
+
+

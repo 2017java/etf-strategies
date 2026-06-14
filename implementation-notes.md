@@ -166,3 +166,104 @@
 | 2 | 前端 `npm run build` | **0 error** ✅ |
 | 3 | 后端启动 `python run.py` | **无 ImportError** ✅ |
 | 4 | Git 独立仓库 | **main 分支，34+ 提交历史，远程 zhitu** ✅ |
+
+---
+
+# 28f78de 恢复操作 Implementation Notes
+
+**分支**：`fix/restore-28f78de`
+**日期**：2026-06-12
+**目标**：从 28f78de 提交恢复被 git 事故简化/重写的 18 个文件，并合并 v2.1 新增功能
+
+---
+
+## 决策日志
+
+### D10 · 恢复策略：用 28f78de 原始版覆盖，再合并 v2.1 增量
+- **背景**：SESSION_HANDOFF 文档列出了三种修复策略（恢复原始版/保留当前版补齐/混合）。之前的 agent 选择"保留当前版补齐"，但结果不理想——12 个 CRITICAL 问题说明重建代码与后端严重脱节。
+- **决策**：用 28f78de 原始版覆盖全部 18 个差异文件，然后手动合并 v2.1 新增功能。
+- **理由**：28f78de 是用户验证通过的版本，功能完整。重建版本虽然 UI 设计可能更好，但前后端 API 不对齐（回测完全不可用、K 线路由未注册等），不具生产可用性。
+- **影响**：前端 BacktestRunner/BacktestCompare/LLMRecommend 恢复为原始版，可能丢失 v2.1 重建时的一些 UI 改进（如 active 样式增强）。但功能正确性优先于 UI 美化。
+
+### D11 · kline_routes 响应格式调整
+- **背景**：原始 kline_routes.py 返回 `{code, data: records}`，前端 KlineResponse 期望 `{code, name, kline: KlinePoint[]}`。
+- **决策**：修改后端响应格式为 `{code, name, kline}`，匹配前端类型定义。
+- **理由**：前端已定义 KlineResponse/KlinePoint 类型且 ETFDetail.tsx 已据此实现。改后端比改前端更简单，且 REST 响应包含 `name` 和 `kline` 语义更清晰。
+- **影响**：kline_routes.py 从 `_git1247` 中的 v2.1 新增版本被重写。
+
+### D12 · getEtfKline URL 修改
+- **背景**：前端 `getEtfKline` 原来调用 `/api/etf/kline?code=xxx&days=120`，后端路由是 `/api/kline/{code}?days=120`。
+- **决策**：修改前端 URL 匹配后端 path 参数格式。
+- **理由**：后端 `/api/kline/{code}` 更 RESTful，且已在 main.py 注册。改一行前端比重构后端路由更安全。
+
+### D13 · onEtfClick 类型转换
+- **背景**：QuantRanking 的 `onEtfClick` 参数类型是 `QuantRecommend`，LLMRecommend 的是 `LLMRecommend`，但 `setSelectedEtf` 需要 `ETFItem` 类型。
+- **决策**：在 Dashboard.tsx 中用 `data.etf_list.find(e => e.code === etf.code)` 做类型转换。
+- **理由**：ETFDetail 需要 ETFItem 的完整字段（current_price, composite_score 等），QuantRecommend/LLMRecommend 只有部分字段。通过 etf_list 查找可获取完整数据。
+- **权衡**：如果 etf_list 中找不到对应 ETF（理论上不会），则不会打开详情弹窗。这是合理的防御性行为。
+
+### D14 · _git1247/ 和 SESSION_HANDOFF 不入库
+- **背景**：`_git1247/` 是回收站恢复的 .git 目录，`SESSION_HANDOFF_*.md` 是会话交接文档，都不是项目代码。
+- **决策**：将它们加入 .gitignore，并从 git 暂存区移除。
+- **理由**：`_git1247/` 含大量 git 对象文件（100+个二进制 blob），入仓会严重膨胀仓库。SESSION_HANDOFF 是临时文档，不需要版本管理。
+
+---
+
+## 修改实录
+
+### M7 · 从 28f78de 提取 18 个文件覆盖当前版本
+- **后端 16 个文件**：calculator.py, backtest_routes.py, models.py, data_fetcher.py, data_store.py, datasource.py, llm_recommender.py, config.py, tushare_store.py, backtest/engine.py, backtest/metrics.py, strategies/base.py, l1_trend_score.py, l2_multi_factor.py, l3_multi_factor_rsrs.py, sim_portfolio.py
+- **前端 3 个文件**：BacktestRunner.tsx, BacktestCompare.tsx, LLMRecommend.tsx
+- **方法**：`git --git-dir='_git1247/$RX3BTPR.git' show 28f78de:<path> > <local-path>`
+- **注意**：PowerShell 中 `$RX3BTPR` 的 `$` 必须用单引号包裹防止变量展开。
+
+### M8 · main.py 注册 kline_routes
+- 添加 `from app import kline_routes` 和 `app.include_router(kline_routes.router)`。
+
+### M9 · kline_routes.py 重写
+- 路由保持 `/api/kline/{code}?days=120`。
+- 响应格式改为 `{code, name, kline: records}` 匹配 KlineResponse。
+- 使用 `timedelta` 根据 days 参数计算 start_date。
+
+### M10 · api.ts getEtfKline URL 修正
+- `/api/etf/kline?code=xxx&days=120` → `/api/kline/{code}?days=120`
+
+### M11 · Dashboard.tsx 添加 ETFDetail 交互
+- 新增 `selectedEtf` 状态和 `ETFDetail` 弹窗。
+- 给 ETFTable、QuantRanking、LLMRecommend 传递 `onEtfClick` 回调。
+- QuantRanking/LLMRecommend 的 onEtfClick 通过 etf_list 查找转换为 ETFItem。
+
+### M12 · ETFTable.tsx 添加 onEtfClick
+- 新增 `onEtfClick?: (etf: ETFItem) => void` prop。
+- 代码和名称列在 onEtfClick 存在时渲染为可点击按钮。
+
+### M13 · QuantRanking.tsx 添加 onEtfClick
+- 新增 `onEtfClick?: (etf: QuantRecommend) => void` prop。
+- 名称和代码在 onEtfClick 存在时渲染为可点击按钮。
+
+### M14 · LLMRecommend.tsx 添加 onEtfClick
+- 新增 `onEtfClick?: (etf: LLMRecommend) => void` prop。
+- 名称和代码在 onEtfClick 存在时渲染为可点击按钮。
+
+### M15 · .gitignore 更新
+- 新增 `_git1247/`, `_git1308/`, `SESSION_HANDOFF_*.md`。
+
+---
+
+## 未做的事 & 已知遗留
+
+1. **SimPortfolio 的 onEtfClick**：v2.1 原始设计中 SimPortfolio 持仓行也应可点击打开 ETFDetail，但 28f78de 原始版的 SimPortfolio.tsx 不含此功能。本次未添加，可后续补充。
+2. **前端 12 个 CRITICAL 问题的修复**：恢复 28f78de 后，这些问题大部分应已消失（原始版后端 API 格式与前端一致），但需用户实际测试确认。
+3. **BatchBuyModal 均分/自定义模式**：v2.1 原始设计中有"均分/自定义"模式切换，但 28f78de 原始版的 SimPortfolio.tsx 不含此功能。本次恢复的是原始版，不包含此功能。
+4. **PositionEditModal ETF 搜索选择**：同上，28f78de 原始版不含此功能。
+
+---
+
+## 回归测试结果
+
+| # | 测试项 | 结果 |
+|---|---|---|
+| 1 | 后端 pytest | **37/37 passed** ✅ |
+| 2 | 前端 TypeScript 类型检查 | **0 error** ✅ |
+| 3 | 前端 `npm run build` | **0 error** ✅ |
+| 4 | 后端 `from app.main import app` | **App import OK** ✅ |

@@ -1,85 +1,60 @@
-import pandas as pd
 import numpy as np
-from typing import List, Dict
+import pandas as pd
+import math
+from datetime import date
+from app.strategies.base import Strategy, RebalanceSignal
 
-from app.strategies.base import RebalanceSignal
 
+class L1TrendScore(Strategy):
+    """L1: 趋势评分 TOP1。
+    动量得分 = 年化收益 × R²，对数价格线性回归。
+    始终持有得分最高的 1 只 ETF；目标变化才换手。"""
 
-class L1TrendScore:
-    name = "l1_trend_score"
+    name = "L1 趋势评分 TOP1"
+    rebalance_freq = "daily"
 
-    def __init__(self, codes: List[str] = None, m_days: int = 20, top_n: int = 5):
-        self.codes = codes or []
+    def __init__(self, m_days: int = 25, codes: list[str] | None = None):
         self.m_days = m_days
-        self.top_n = top_n
+        self.codes = codes
 
-    def trend_score(self, closes: pd.Series) -> float:
-        if len(closes) < self.m_days:
-            return 0.0
-        recent = closes.iloc[-self.m_days:]
-        x = np.arange(len(recent))
-        y = recent.values
-        if y.std() == 0:
-            return 0.0
-        slope = np.polyfit(x, y, 1)[0]
-        return float(slope / y.mean() * 100)
+    def trend_score(self, close: pd.Series) -> float:
+        y = np.log(close.values)
+        x = np.arange(len(y))
+        slope, intercept = np.polyfit(x, y, 1)
+        ann_ret = math.exp(slope) ** 250 - 1
+        y_pred = slope * x + intercept
+        ss_res = ((y - y_pred) ** 2).sum()
+        ss_tot = ((y - y.mean()) ** 2).sum()
+        r2 = 1 - ss_res / ss_tot if ss_tot > 0 else 0
+        return ann_ret * r2
 
-    def generate_signals(self, ohlcv: pd.DataFrame, calendar: list) -> List[RebalanceSignal]:
-        codes = self.codes if self.codes else self._extract_codes(ohlcv)
-        signals = []
-        monthly_dates = self._monthly_dates(calendar)
+    def generate_signals(self, ohlcv, calendar):
+        all_codes = self.codes or sorted({c for _, c in ohlcv.index})
+        all_dates = sorted({d for d, _ in ohlcv.index})
 
-        for d in monthly_dates:
-            scores = {}
-            for code in codes:
-                try:
-                    closes = self._get_closes_before(ohlcv, code, d)
-                    if len(closes) >= self.m_days:
-                        scores[code] = self.trend_score(closes)
-                except Exception:
+        close_by_code = {}
+        for code in all_codes:
+            s = ohlcv.xs(code, level="code")["close"].sort_index()
+            s.index = pd.DatetimeIndex(pd.to_datetime(s.index))
+            close_by_code[code] = s
+
+        signals: list[RebalanceSignal] = []
+        current: str | None = None
+
+        for d in all_dates:
+            scores: dict[str, float] = {}
+            for code, series in close_by_code.items():
+                hist = series[series.index <= pd.Timestamp(d)].tail(self.m_days)
+                if len(hist) < self.m_days:
                     continue
-
+                scores[code] = self.trend_score(hist)
             if not scores:
                 continue
-
-            sorted_codes = sorted(scores.keys(), key=lambda c: scores[c], reverse=True)
-            target = sorted_codes[: self.top_n]
-            signals.append(
-                RebalanceSignal(
-                    date=d,
-                    target_codes=target,
-                    reason="l1_trend_score",
-                    scores={c: scores[c] for c in target},
-                )
-            )
-
+            best = max(scores, key=scores.get)
+            if best != current:
+                current = best
+                signals.append(RebalanceSignal(
+                    date=d, target_codes=[best],
+                    reason=f"趋势评分最高: {best}", scores=scores,
+                ))
         return signals
-
-    def _extract_codes(self, ohlcv: pd.DataFrame) -> list:
-        if isinstance(ohlcv.index, pd.MultiIndex):
-            return list(set(ohlcv.index.get_level_values("code")))
-        elif "code" in ohlcv.columns:
-            return list(set(ohlcv["code"]))
-        return []
-
-    def _monthly_dates(self, calendar: list) -> list:
-        if not calendar:
-            return []
-        from itertools import groupby
-        result = []
-        for key, group in groupby(calendar, key=lambda d: (d.year, d.month)):
-            dates_in_month = list(group)
-            result.append(dates_in_month[-1])
-        return result
-
-    def _get_closes_before(self, ohlcv: pd.DataFrame, code: str, date) -> pd.Series:
-        if isinstance(ohlcv.index, pd.MultiIndex):
-            try:
-                sub = ohlcv.xs(code, level="code")
-                sub = sub[sub.index <= date]
-                return sub["close"]
-            except KeyError:
-                return pd.Series(dtype=float)
-        else:
-            mask = (ohlcv["code"] == code) & (ohlcv["date"] <= date)
-            return ohlcv.loc[mask, "close"]

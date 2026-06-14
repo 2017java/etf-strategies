@@ -1,178 +1,184 @@
-import pandas as pd
 import numpy as np
-from typing import List, Dict
+import pandas as pd
+from datetime import date
+from app.strategies.base import Strategy, RebalanceSignal
+from app.strategies.l2_multi_factor import FACTORS, _standardize, compute_valuation_composite
 
-from app.strategies.base import RebalanceSignal
 
+def compute_rsrs(high: pd.Series, low: pd.Series, n: int = 18, m: int = 600) -> float:
+    """计算 RSRS 指标（阻力支撑相对强度）。
 
-def compute_rsrs(
-    high: pd.Series,
-    low: pd.Series,
-    n: int = 18,
-    m: int = 600,
-) -> float:
+    1. 对每 N 日的 high/low 做线性回归 high = beta * low + alpha，得到 beta 序列
+    2. 取最近 M 个 beta 值做 z-score 标准化
+    3. RSRS = beta * z_score
+    """
     if len(high) < n or len(low) < n:
         return 0.0
-    high_vals = high.values
-    low_vals = low.values
-    betas = []
-    for i in range(n - 1, len(high_vals)):
-        h_window = high_vals[i - n + 1 : i + 1]
-        l_window = low_vals[i - n + 1 : i + 1]
-        x = l_window
-        y = h_window
-        x_mean = x.mean()
-        y_mean = y.mean()
-        numerator = np.sum((x - x_mean) * (y - y_mean))
-        denominator = np.sum((x - x_mean) ** 2)
-        if denominator == 0:
-            continue
-        beta = numerator / denominator
-        betas.append(beta)
+    high_arr = high.values
+    low_arr = low.values
+
+    betas: list[float] = []
+    for i in range(n, len(high_arr) + 1):
+        window_low = low_arr[i - n : i]
+        window_high = high_arr[i - n : i]
+        try:
+            beta, _ = np.polyfit(window_low, window_high, 1)
+        except (np.linalg.LinAlgError, ValueError):
+            beta = 0.0
+        betas.append(float(beta))
 
     if not betas:
         return 0.0
 
-    betas_series = pd.Series(betas)
-    if len(betas_series) < 2:
-        return 0.0
+    current_beta = betas[-1]
+    beta_window = betas[-m:] if len(betas) >= m else betas
+    beta_arr = np.array(beta_window, dtype=float)
+    beta_std = float(beta_arr.std(ddof=0))
+    beta_mean = float(beta_arr.mean())
+    if beta_std == 0:
+        z_score = 0.0
+    else:
+        z_score = (current_beta - beta_mean) / beta_std
+    return float(current_beta * z_score)
 
-    mean_beta = betas_series.mean()
-    std_beta = betas_series.std()
-    if std_beta == 0:
-        return 0.0
 
-    rsrs = (betas_series.iloc[-1] - mean_beta) / std_beta
-    return float(rsrs)
+class L3MultiFactorRSRS(Strategy):
+    """L3: 多因子 TOP5 + RSRS 择时。"""
 
-
-class L3MultiFactorRSRS:
-    name = "l3_multi_factor_rsrs"
+    name = "L3 多因子 + RSRS 择时"
+    rebalance_freq = "monthly"
 
     def __init__(
         self,
-        codes: List[str] = None,
-        benchmark_code: str = "510300",
         top_n: int = 5,
         rsrs_n: int = 18,
         rsrs_m: int = 600,
-        benchmark_threshold: float = 0.0,
-        stock_threshold: float = 0.0,
+        benchmark_code: str = "510300",
+        benchmark_threshold: float = -0.5,
+        stock_threshold: float = -0.8,
+        codes: list[str] | None = None,
     ):
-        self.codes = codes or []
-        self.benchmark_code = benchmark_code
         self.top_n = top_n
         self.rsrs_n = rsrs_n
         self.rsrs_m = rsrs_m
+        self.benchmark_code = benchmark_code
         self.benchmark_threshold = benchmark_threshold
         self.stock_threshold = stock_threshold
+        self.codes = codes
 
-    def generate_signals(self, ohlcv: pd.DataFrame, calendar: list) -> List[RebalanceSignal]:
-        codes = self.codes if self.codes else self._extract_codes(ohlcv)
-        signals = []
-        monthly_dates = self._monthly_dates(calendar)
+    def _compute_multi_factor_scores(
+        self, ohlcv: pd.DataFrame, d: date, codes: list[str]
+    ) -> dict[str, float]:
+        per_factor: dict[str, pd.Series] = {f: pd.Series(dtype=float) for f in FACTORS}
 
-        for d in monthly_dates:
-            bench_rsrs = self._compute_etf_rsrs(ohlcv, self.benchmark_code, d)
-            if bench_rsrs < self.benchmark_threshold:
-                signals.append(
-                    RebalanceSignal(
-                        date=d,
-                        target_codes=[],
-                        reason=f"l3_benchmark_weak(rsrs={bench_rsrs:.2f})",
-                        scores={},
-                    )
-                )
+        for code in codes:
+            try:
+                sub = ohlcv.xs(code, level="code")
+            except KeyError:
+                continue
+            sub.index = pd.DatetimeIndex(pd.to_datetime(sub.index))
+            sub = sub[sub.index <= pd.Timestamp(d)]
+            if len(sub) < 30:
                 continue
 
-            scores = {}
-            for code in codes:
-                if code == self.benchmark_code:
-                    continue
-                try:
-                    closes = self._get_closes_before(ohlcv, code, d)
-                    if len(closes) < 20:
-                        continue
-                    trend = self._trend_score(closes)
-                    momentum = self._momentum(closes)
-                    stock_rsrs = self._compute_etf_rsrs(ohlcv, code, d)
-                    if stock_rsrs < self.stock_threshold:
-                        continue
-                    composite = trend * 0.3 + momentum * 0.3 + stock_rsrs * 0.4
-                    scores[code] = round(composite, 4)
-                except Exception:
-                    continue
+            close = sub["close"]
+            volume = sub["volume"]
 
-            sorted_codes = sorted(scores.keys(), key=lambda c: scores[c], reverse=True)
-            target = sorted_codes[: self.top_n]
-            signals.append(
-                RebalanceSignal(
-                    date=d,
-                    target_codes=target,
-                    reason="l3_multi_factor_rsrs",
-                    scores={c: scores[c] for c in target},
-                )
-            )
+            mom_20 = (close.iloc[-1] / close.iloc[-20] - 1) if len(close) >= 20 else 0
+            vol_5 = volume.tail(5).mean()
+            vol_20 = volume.tail(20).mean()
+            vol_expand = (vol_5 / vol_20 - 1) if vol_20 > 0 else 0
+            reversal_30 = -(close.iloc[-1] / close.iloc[-30] - 1) if len(close) >= 30 else 0
+            val_comp = compute_valuation_composite(close)
+            vol_20d = close.pct_change().tail(20).std(ddof=0)
+            inv_vol = 1.0 / (vol_20d + 1e-6) if vol_20d > 0 else 0
 
-        return signals
+            for fname, val in [
+                ("momentum_20d", mom_20),
+                ("volume_expand", vol_expand),
+                ("reversal_30d", reversal_30),
+                ("valuation_composite", val_comp),
+                ("inv_volatility", inv_vol),
+            ]:
+                per_factor[fname][code] = float(val)
 
-    def _extract_codes(self, ohlcv: pd.DataFrame) -> list:
-        if isinstance(ohlcv.index, pd.MultiIndex):
-            return list(set(ohlcv.index.get_level_values("code")))
-        elif "code" in ohlcv.columns:
-            return list(set(ohlcv["code"]))
-        return []
+        all_codes_set = set().union(*[s.index for s in per_factor.values()]) if per_factor else set()
+        final: dict[str, float] = {}
+        for code in all_codes_set:
+            weighted = 0.0
+            for fname, w in FACTORS.items():
+                s = per_factor[fname]
+                if code in s.index:
+                    z = float(_standardize(s).get(code, 0.0) or 0.0)
+                    weighted += z * w
+            final[code] = weighted
+        return final
 
-    def _compute_etf_rsrs(self, ohlcv: pd.DataFrame, code: str, date) -> float:
-        if isinstance(ohlcv.index, pd.MultiIndex):
-            try:
-                sub = ohlcv.xs(code, level="code")
-                sub = sub[sub.index <= date]
-            except KeyError:
-                return 0.0
-        else:
-            mask = (ohlcv["code"] == code) & (ohlcv["date"] <= date)
-            sub = ohlcv.loc[mask]
-
+    def _compute_rsrs_for_code(
+        self, ohlcv: pd.DataFrame, d: date, code: str
+    ) -> float:
+        try:
+            sub = ohlcv.xs(code, level="code")
+        except KeyError:
+            return 0.0
+        sub.index = pd.DatetimeIndex(pd.to_datetime(sub.index))
+        sub = sub[sub.index <= pd.Timestamp(d)].sort_index()
         if len(sub) < self.rsrs_n:
             return 0.0
+        return compute_rsrs(sub["high"], sub["low"], self.rsrs_n, self.rsrs_m)
 
-        return compute_rsrs(sub["high"], sub["low"], n=self.rsrs_n, m=self.rsrs_m)
-
-    def _monthly_dates(self, calendar: list) -> list:
-        if not calendar:
+    def generate_signals(self, ohlcv, calendar):
+        all_codes = self.codes or sorted(
+            {c for _, c in ohlcv.index if c != self.benchmark_code}
+        )
+        all_dates = sorted({d for d, _ in ohlcv.index})
+        if not all_dates:
             return []
-        from itertools import groupby
-        result = []
-        for key, group in groupby(calendar, key=lambda d: (d.year, d.month)):
-            dates_in_month = list(group)
-            result.append(dates_in_month[-1])
-        return result
 
-    def _trend_score(self, closes: pd.Series) -> float:
-        if len(closes) < 20:
-            return 0.0
-        recent = closes.iloc[-20:]
-        x = np.arange(len(recent))
-        y = recent.values
-        if y.std() == 0:
-            return 0.0
-        slope = np.polyfit(x, y, 1)[0]
-        return float(slope / y.mean() * 100)
+        monthly_first: list[date] = []
+        last_month = None
+        for d in all_dates:
+            ym = (d.year, d.month)
+            if ym != last_month:
+                monthly_first.append(d)
+                last_month = ym
 
-    def _momentum(self, closes: pd.Series) -> float:
-        if len(closes) < 20:
-            return 0.0
-        return float((closes.iloc[-1] / closes.iloc[-20] - 1) * 100)
+        signals: list[RebalanceSignal] = []
+        current: set[str] | None = None
 
-    def _get_closes_before(self, ohlcv: pd.DataFrame, code: str, date) -> pd.Series:
-        if isinstance(ohlcv.index, pd.MultiIndex):
-            try:
-                sub = ohlcv.xs(code, level="code")
-                sub = sub[sub.index <= date]
-                return sub["close"]
-            except KeyError:
-                return pd.Series(dtype=float)
-        else:
-            mask = (ohlcv["code"] == code) & (ohlcv["date"] <= date)
-            return ohlcv.loc[mask, "close"]
+        for d in monthly_first:
+            bench_rsrs = self._compute_rsrs_for_code(ohlcv, d, self.benchmark_code)
+
+            if bench_rsrs < self.benchmark_threshold:
+                target: list[str] = []
+                reason = f"大盘 RSRS={bench_rsrs:.3f} < {self.benchmark_threshold}，空仓"
+                scores: dict[str, float] = {}
+            else:
+                scores = self._compute_multi_factor_scores(ohlcv, d, all_codes)
+                if not scores:
+                    continue
+                per_code_rsrs: dict[str, float] = {}
+                for code in all_codes:
+                    per_code_rsrs[code] = self._compute_rsrs_for_code(ohlcv, d, code)
+                filtered = {
+                    c: s for c, s in scores.items()
+                    if per_code_rsrs.get(c, 0.0) >= self.stock_threshold
+                }
+                if not filtered:
+                    target = []
+                    reason = "所有个股 RSRS 偏弱，空仓"
+                else:
+                    target = sorted(filtered, key=filtered.get, reverse=True)[: self.top_n]
+                    reason = (
+                        f"多因子 TOP{self.top_n} + RSRS 过滤 "
+                        f"(大盘={bench_rsrs:.3f})"
+                    )
+
+            target_set = set(target)
+            if current is None or target_set != current:
+                current = target_set
+                signals.append(RebalanceSignal(
+                    date=d, target_codes=target,
+                    reason=reason, scores=scores,
+                ))
+        return signals

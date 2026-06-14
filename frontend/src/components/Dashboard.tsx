@@ -4,6 +4,8 @@ import ETFTable from "./ETFTable";
 import QuantRanking from "./QuantRanking";
 import LLMRecommend from "./LLMRecommend";
 import SimPortfolio from "./SimPortfolio";
+import ETFDetail from "./ETFDetail";
+import ProgressBar from "./ProgressBar";
 import { RefreshCw, BarChart3, Wallet, Activity, Trophy, TrendingUp, Zap } from "lucide-react";
 import type { ETFItem } from "../types";
 
@@ -30,6 +32,7 @@ function MetricCard({
 export default function Dashboard() {
   const { data, loading, error, load } = useDashboard();
   const [activeTab, setActiveTab] = useState<"market" | "sim">("market");
+  const [selectedEtf, setSelectedEtf] = useState<ETFItem | null>(null);
 
   const topScore = data?.etf_list.reduce(
     (prev, curr) => (curr.composite_score > prev.composite_score ? curr : prev), data.etf_list[0]
@@ -110,13 +113,21 @@ export default function Dashboard() {
           <div className="rounded-xl bg-rose-50 border border-rose-100 text-rose-700 px-4 py-3 text-sm">{error}</div>
         )}
 
+        <ProgressBar />
+
         {/* 行情看板页面 */}
         {activeTab === "market" && (
           <>
             {data && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <QuantRanking data={data.quant_top5} />
-                <LLMRecommend data={data.llm_top5} />
+                <QuantRanking data={data.quant_top5} onEtfClick={(etf) => {
+                  const found = data.etf_list.find(e => e.code === etf.code);
+                  if (found) setSelectedEtf(found);
+                }} />
+                <LLMRecommend data={data.llm_top5} onEtfClick={(etf) => {
+                  const found = data.etf_list.find(e => e.code === etf.code);
+                  if (found) setSelectedEtf(found);
+                }} />
               </div>
             )}
 
@@ -128,7 +139,7 @@ export default function Dashboard() {
               </div>
             )}
 
-            {data && <ETFTable data={data.etf_list} />}
+            {data && <ETFTable data={data.etf_list} onEtfClick={(etf) => setSelectedEtf(etf)} />}
 
             {!data && !loading && !error && (
               <div className="text-center py-20 text-slate-400 text-sm">点击右上角"刷新运算"加载数据</div>
@@ -141,6 +152,15 @@ export default function Dashboard() {
           <SimPortfolio />
         )}
       </main>
+
+      {selectedEtf && (
+        <ETFDetail
+          code={selectedEtf.code}
+          name={selectedEtf.name}
+          etfData={selectedEtf}
+          onClose={() => setSelectedEtf(null)}
+        />
+      )}
     </div>
   );
 }

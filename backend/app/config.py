@@ -1,70 +1,79 @@
+from datetime import time
 from pathlib import Path
 from dotenv import load_dotenv
-import os
 
-load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+env_path = Path(__file__).resolve().parent.parent / ".env"
+load_dotenv(env_path)
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DATA_DIR = PROJECT_ROOT / "data"
-OHLCV_DIR = DATA_DIR / "ohlcv"
-BACKTEST_RUNS_DIR = DATA_DIR / "backtest_runs"
-
-OHLCV_DIR.mkdir(parents=True, exist_ok=True)
-BACKTEST_RUNS_DIR.mkdir(parents=True, exist_ok=True)
-
-ETF_POOL = [
-    {"code": "510050", "name": "上证50ETF"},
-    {"code": "510300", "name": "沪深300ETF"},
-    {"code": "510500", "name": "中证500ETF"},
-    {"code": "510180", "name": "180ETF"},
-    {"code": "510900", "name": "H股ETF"},
-    {"code": "511010", "name": "国债ETF"},
-    {"code": "512100", "name": "中证1000ETF"},
-    {"code": "512170", "name": "医疗ETF"},
-    {"code": "512660", "name": "军工ETF"},
-    {"code": "512690", "name": "白酒ETF"},
-    {"code": "512760", "name": "半导体ETF"},
-    {"code": "512880", "name": "证券ETF"},
-    {"code": "513100", "name": "纳指ETF"},
-    {"code": "513500", "name": "标普500ETF"},
-    {"code": "515030", "name": "新能源车ETF"},
-    {"code": "515050", "name": "5GETF"},
-    {"code": "515790", "name": "光伏ETF"},
-    {"code": "518880", "name": "黄金ETF"},
-    {"code": "159915", "name": "创业板ETF"},
-    {"code": "159995", "name": "芯片ETF"},
-]
-
-DEFAULT_ETF_CODES = [e["code"] for e in ETF_POOL]
-
-BENCHMARK_REGISTRY = {
-    "510300": "沪深300ETF",
-    "510500": "中证500ETF",
-    "510050": "上证50ETF",
-    "159915": "创业板ETF",
-    "512100": "中证1000ETF",
-    "510180": "180ETF",
-    "512880": "证券ETF",
-    "512660": "军工ETF",
-    "512170": "医疗ETF",
-    "512690": "白酒ETF",
-    "512760": "半导体ETF",
-    "515030": "新能源车ETF",
-    "515050": "5GETF",
-    "515790": "光伏ETF",
-    "518880": "黄金ETF",
-    "513100": "纳指ETF",
-    "513500": "标普500ETF",
-    "510900": "H股ETF",
-    "511010": "国债ETF",
-    "159995": "芯片ETF",
+# ETF代码池
+ETF_POOL = {
+    "宽基ETF": [
+        {"code": "510300", "name": "沪深300ETF"},
+        {"code": "510500", "name": "中证500ETF"},
+        {"code": "512100", "name": "中证1000ETF"},
+        {"code": "159531", "name": "中证2000ETF"},
+        {"code": "159915", "name": "创业板ETF"},
+        {"code": "560050", "name": "A50ETF"},
+        {"code": "159901", "name": "深证100ETF"},
+        {"code": "588030", "name": "科创100ETF博时"},
+        {"code": "159920", "name": "恒生ETF"},
+        {"code": "588000", "name": "科创50ETF"},
+    ],
+    "行业ETF": [
+        {"code": "159739", "name": "云计算ETF鹏华"},
+        {"code": "159669", "name": "食品饮料ETF"},
+        {"code": "159732", "name": "消费电子ETF"},
+        {"code": "588200", "name": "科创芯片ETF嘉实"},
+        {"code": "159806", "name": "新能源车ETF"},
+        {"code": "515120", "name": "创新药ETF"},
+        {"code": "562510", "name": "旅游ETF华夏"},
+        {"code": "512170", "name": "医疗ETF"},
+        {"code": "159857", "name": "光伏ETF"},
+        {"code": "159928", "name": "消费ETF"},
+        {"code": "512690", "name": "酒ETF"},
+        {"code": "159755", "name": "电池ETF"},
+        {"code": "159222", "name": "自由现金流ETF"},
+        {"code": "515880", "name": "通信ETF"},
+        {"code": "512630", "name": "卫星ETF"},
+        {"code": "512200", "name": "房地产ETF"},
+        {"code": "512660", "name": "军工ETF"},
+        {"code": "159819", "name": "人工智能ETF"},
+        {"code": "159995", "name": "芯片ETF"},
+        {"code": "515220", "name": "煤炭ETF"},
+        {"code": "510410", "name": "资源ETF"},
+        {"code": "159516", "name": "半导体设备ETF"},
+        {"code": "159309", "name": "油气ETF"},
+        {"code": "515070", "name": "人工智能AIETF"},
+        {"code": "159611", "name": "电力ETF"},
+        {"code": "512400", "name": "有色金属ETF"},
+        {"code": "517520", "name": "黄金ETF"},
+        {"code": "159608", "name": "稀有金属ETF"},
+        {"code": "159870", "name": "化工ETF"},
+        {"code": "159326", "name": "电网设备ETF华夏"},
+        {"code": "159566", "name": "储能电池ETF"},
+        {"code": "159770", "name": "机器人ETF"},
+        {"code": "512880", "name": "证券ETF"},
+    ],
 }
 
-LLM_API_KEY = os.getenv("LLM_API_KEY", "")
-LLM_API_BASE = os.getenv("LLM_API_BASE", "")
-LLM_MODEL = os.getenv("LLM_MODEL", "")
+# 权重配置
+WEIGHTS = {
+    "current_change": 2,
+    "two_day_change": 3,
+    "volume_expand": 0.5,
+    "change_30d": 1,  # 30日涨跌幅标准分（0~50分映射）
+}
 
-TUSHARE_TOKEN = os.getenv("TUSHARE_TOKEN", "")
-TUSHARE_API = os.getenv("TUSHARE_API", "http://101.35.233.113:8020/")
+# 交易时段配置（北京时间）
+TRADE_MORNING_START = time(9, 30)
+TRADE_MORNING_END = time(11, 30)
+TRADE_AFTERNOON_START = time(13, 0)
+TRADE_AFTERNOON_END = time(15, 0)
 
-DATA_SOURCE = os.getenv("ETF_DATA_SOURCE", "akshare")
+# 数据缓存时间（秒）
+CACHE_TTL = 300
+
+# LLM配置（从环境变量读取）
+LLM_API_KEY = ""
+LLM_API_BASE = "https://api.openai.com/v1"
+LLM_MODEL = "gpt-4o-mini"

@@ -67,3 +67,7 @@ backend/diag_llm.py
 backup_migration_2026-06-11/
 *.bundle
 
+_git1247/
+_git1308/
+SESSION_HANDOFF_*.md
+

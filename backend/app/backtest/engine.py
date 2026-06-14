@@ -1,27 +1,34 @@
 import pandas as pd
-import numpy as np
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional
+from datetime import date
+from typing import Literal
+import logging
 
+from app.strategies.base import RebalanceSignal
+from app.backtest.metrics import compute_metrics
+
+logger = logging.getLogger(__name__)
 
 @dataclass
-class TradeRecord:
-    date: object
-    action: str
+class Trade:
+    date: date
     code: str
-    name: str
-    shares: int
+    action: Literal["buy", "sell"]
     price: float
+    shares: int
     amount: float
-    cost: float = 0.0
-
+    reason: str
 
 @dataclass
 class BacktestResult:
-    nav: pd.Series = field(default_factory=pd.Series)
-    benchmark_nav: pd.Series = field(default_factory=pd.Series)
-    trades: List[Dict] = field(default_factory=list)
-    metrics: Dict = field(default_factory=dict)
+    strategy: str
+    start: date
+    end: date
+    cost_rate: float
+    nav: pd.Series
+    benchmark_nav: pd.Series
+    trades: list[Trade] = field(default_factory=list)
+    metrics: dict = field(default_factory=dict)
 
 
 class BacktestEngine:
@@ -31,164 +38,94 @@ class BacktestEngine:
 
     def run(
         self,
-        signals: list,
+        signals: list[RebalanceSignal],
         ohlcv: pd.DataFrame,
         benchmark_code: str = "510300",
     ) -> BacktestResult:
         if ohlcv.empty:
-            return BacktestResult()
+            raise ValueError("ohlcv is empty")
 
-        ohlcv = ohlcv.sort_index()
-        if isinstance(ohlcv.index, pd.MultiIndex):
-            all_dates = sorted(set(ohlcv.index.get_level_values("date")))
-        else:
-            all_dates = sorted(set(ohlcv["date"]))
+        all_dates = sorted({d for d, _ in ohlcv.index})
+        close_matrix = ohlcv["close"].unstack(level="code")
+        open_matrix = ohlcv["open"].unstack(level="code")
+        codes = list(close_matrix.columns)
 
-        if not all_dates:
-            return BacktestResult()
+        if benchmark_code not in codes:
+            benchmark_code = codes[0]
+
+        sig_map: dict[date, RebalanceSignal] = {s.date: s for s in signals}
 
         cash = self.initial_cash
-        holdings: Dict[str, int] = {}
-        nav_records = []
-        benchmark_nav_records = []
-        trade_records: List[Dict] = []
+        positions: dict[str, int] = {}
+        nav_records: dict[date, float] = {}
+        benchmark_records: dict[date, float] = {}
+        trades: list[Trade] = []
 
-        signal_map = {}
-        for s in signals:
-            signal_map[s.date] = s
-
-        benchmark_prices = self._get_prices(ohlcv, benchmark_code)
-        first_benchmark = True
+        first_sig_date = signals[0].date if signals else all_dates[0]
+        first_open = open_matrix.at[first_sig_date, benchmark_code] if first_sig_date in open_matrix.index else 0
+        bench_shares = int(self.initial_cash / first_open / 100) * 100 if first_open > 0 else 0
 
         for d in all_dates:
-            if d in signal_map:
-                sig = signal_map[d]
-                prices = self._get_all_prices(ohlcv, d)
-                total_value = cash
-                for code, shares in holdings.items():
-                    p = prices.get(code, 0)
-                    total_value += shares * p
+            row_open = open_matrix.loc[d] if d in open_matrix.index else None
+            row_close = close_matrix.loc[d] if d in close_matrix.index else None
+            if row_close is None:
+                continue
 
-                for code in list(holdings.keys()):
-                    if code not in sig.target_codes:
-                        p = prices.get(code, 0)
-                        if p > 0 and holdings[code] > 0:
-                            shares = holdings[code]
-                            amount = shares * p
-                            cost = amount * self.cost_rate
-                            cash += amount - cost
-                            trade_records.append({
-                                "date": str(d),
-                                "action": "sell",
-                                "code": code,
-                                "shares": shares,
-                                "price": p,
-                                "amount": round(amount, 2),
-                                "cost": round(cost, 2),
-                            })
-                            del holdings[code]
+            if d in sig_map and row_open is not None:
+                sig = sig_map[d]
+                new_target = set(sig.target_codes)
+                current = set(positions.keys())
 
-                if sig.target_codes:
-                    for code in sig.target_codes:
-                        if code in holdings:
-                            continue
-                        p = prices.get(code, 0)
-                        if p > 0:
-                            alloc = total_value / len(sig.target_codes)
-                            if code in holdings:
-                                current_val = holdings[code] * p
-                                remaining = alloc - current_val
-                            else:
-                                remaining = alloc
-                            if remaining > 0:
-                                shares = int(remaining / p / 100) * 100
-                                if shares > 0:
-                                    amount = shares * p
-                                    cost = amount * self.cost_rate
-                                    if amount + cost <= cash:
-                                        cash -= amount + cost
-                                        holdings[code] = shares
-                                        trade_records.append({
-                                            "date": str(d),
-                                            "action": "buy",
-                                            "code": code,
-                                            "shares": shares,
-                                            "price": p,
-                                            "amount": round(amount, 2),
-                                            "cost": round(cost, 2),
-                                        })
+                for code in current - new_target:
+                    if code in row_open.index and row_open[code] > 0:
+                        price = float(row_open[code])
+                        shares = positions[code]
+                        amount = round(shares * price, 2)
+                        fee = round(amount * self.cost_rate, 2)
+                        cash += amount - fee
+                        trades.append(Trade(d, code, "sell", price, shares, amount, sig.reason))
+                        del positions[code]
 
-            prices = self._get_all_prices(ohlcv, d)
-            portfolio_value = cash
-            for code, shares in holdings.items():
-                p = prices.get(code, 0)
-                portfolio_value += shares * p
-            nav = portfolio_value / self.initial_cash
-            nav_records.append((d, nav))
+                to_buy = new_target - current
+                if to_buy:
+                    available = cash
+                    per_code = available / len(to_buy)
+                    for code in to_buy:
+                        if code in row_open.index and row_open[code] > 0:
+                            price = float(row_open[code])
+                            shares = int(per_code / price / 100) * 100
+                            if shares > 0:
+                                amount = round(shares * price, 2)
+                                fee = round(amount * self.cost_rate, 2)
+                                cash -= amount + fee
+                                positions[code] = shares
+                                trades.append(Trade(d, code, "buy", price, shares, amount, sig.reason))
 
-            bp = benchmark_prices.get(d)
-            if bp is not None and bp > 0:
-                if first_benchmark:
-                    benchmark_base = bp
-                    first_benchmark = False
-                benchmark_nav_records.append((d, bp / benchmark_base))
+            pos_value = 0.0
+            for code, shares in positions.items():
+                if code in row_close.index and row_close[code] > 0:
+                    pos_value += shares * float(row_close[code])
+            nav_records[d] = (cash + pos_value) / self.initial_cash
 
-        nav_series = pd.Series(
-            [v for _, v in nav_records],
-            index=pd.to_datetime([d for d, _ in nav_records]),
-            name="nav",
-        )
+            bench_price = float(row_close[benchmark_code])
+            benchmark_records[d] = bench_shares * bench_price / self.initial_cash
 
-        if benchmark_nav_records:
-            benchmark_nav_series = pd.Series(
-                [v for _, v in benchmark_nav_records],
-                index=pd.to_datetime([d for d, _ in benchmark_nav_records]),
-                name="benchmark_nav",
-            )
-        else:
-            benchmark_nav_series = pd.Series(dtype=float, name="benchmark_nav")
+        nav = pd.Series(nav_records, name="nav")
+        nav.index = pd.to_datetime(nav.index)
+        bench_nav = pd.Series(benchmark_records, name="benchmark")
+        bench_nav.index = pd.to_datetime(bench_nav.index)
 
-        from app.backtest.metrics import compute_metrics
-        metrics = compute_metrics(
-            nav_series, trades=trade_records, initial_cash=self.initial_cash
-        )
+        start_d, end_d = nav.index[0].date(), nav.index[-1].date()
+        trade_dicts = [
+            {"amount": t.amount, "action": t.action, "code": t.code, "date": t.date}
+            for t in trades
+        ]
+        metrics = compute_metrics(nav, trade_dicts, self.initial_cash)
 
         return BacktestResult(
-            nav=nav_series,
-            benchmark_nav=benchmark_nav_series,
-            trades=trade_records,
-            metrics=metrics,
+            strategy=signals[0].reason[:20] if signals else "empty",
+            start=start_d, end=end_d,
+            cost_rate=self.cost_rate,
+            nav=nav, benchmark_nav=bench_nav,
+            trades=trades, metrics=metrics,
         )
-
-    def _get_prices(self, ohlcv: pd.DataFrame, code: str) -> dict:
-        prices = {}
-        try:
-            if isinstance(ohlcv.index, pd.MultiIndex):
-                sub = ohlcv.xs(code, level="code")
-                for d, row in sub.iterrows():
-                    prices[d] = row["close"]
-            else:
-                sub = ohlcv[ohlcv["code"] == code]
-                for _, row in sub.iterrows():
-                    prices[row["date"]] = row["close"]
-        except Exception:
-            pass
-        return prices
-
-    def _get_all_prices(self, ohlcv: pd.DataFrame, d) -> dict:
-        prices = {}
-        try:
-            if isinstance(ohlcv.index, pd.MultiIndex):
-                try:
-                    sub = ohlcv.xs(d, level="date")
-                    for code, row in sub.iterrows():
-                        prices[code] = row["close"]
-                except KeyError:
-                    pass
-            else:
-                sub = ohlcv[ohlcv["date"] == d]
-                for _, row in sub.iterrows():
-                    prices[row["code"]] = row["close"]
-        except Exception:
-            pass
-        return prices
