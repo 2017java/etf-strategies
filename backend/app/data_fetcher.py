@@ -251,30 +251,14 @@ def fetch_ma20(code: str) -> Optional[float]:
 def fetch_30d_change(code: str) -> Optional[float]:
     """获取过去30个交易日的涨跌幅
     返回: (当前价 - 30日前价) / 30日前价 * 100
-    
-    三级fallback机制:
-    1) 东方财富: fund_etf_hist_em(qfq) - 尝试1次
-    2) 新浪: fund_etf_hist_sina - 尝试1次
-    3) akshare备选: fund_etf_hist_min_em - 尝试1次
+
+    优先 sina（多线程安全，无 V8 依赖），EM 路径在并发下会触发 py_mini_racer
+    PartitionAlloc 崩溃，已禁用。
     """
     if code in _change_30d_cache:
         return _change_30d_cache[code]
-    
-    # 方案1: 东方财富（前复权）
-    try:
-        df = ak.fund_etf_hist_em(symbol=code, period="daily", adjust="qfq")
-        if df is not None and not df.empty and len(df) >= 31:
-            df = df.sort_values("日期", ascending=False).reset_index(drop=True)
-            price_now = float(df.iloc[0]["收盘"])
-            price_30d_ago = float(df.iloc[30]["收盘"])
-            if price_30d_ago > 0:
-                change_30d = round((price_now - price_30d_ago) / price_30d_ago * 100, 2)
-                _change_30d_cache[code] = change_30d
-                return change_30d
-    except Exception:
-        pass
-    
-    # 方案2: 新浪数据源（与 sina 缓存统一入口合并后只剩 1 次 HTTP）
+
+    # 方案1: 新浪数据源（与统一缓存共用，多线程安全）
     try:
         df = _fetch_sina_history(code, min_rows=31)
         if df is not None:
@@ -286,23 +270,10 @@ def fetch_30d_change(code: str) -> Optional[float]:
                 return change_30d
     except Exception:
         pass
-    
-    # 方案3: akshare备选
-    try:
-        prefix = "sh" if code.startswith(("5", "6", "1")) else "sz"
-        symbol = f"{prefix}{code}"
-        df = ak.fund_etf_hist_min_em(symbol=symbol, period="daily")
-        if df is not None and not df.empty and len(df) >= 31:
-            df = df.sort_values("date", ascending=False).reset_index(drop=True)
-            price_now = float(df.iloc[0]["close"])
-            price_30d_ago = float(df.iloc[30]["close"])
-            if price_30d_ago > 0:
-                change_30d = round((price_now - price_30d_ago) / price_30d_ago * 100, 2)
-                _change_30d_cache[code] = change_30d
-                return change_30d
-    except Exception:
-        pass
-    
+
+    # EM 路径（fund_etf_hist_em / fund_etf_hist_min_em）会触发 py_mini_racer V8
+    # 在多线程并发环境下崩溃整个 Python 进程，已禁用。
+
     # 所有方案都失败
     _change_30d_cache[code] = None
     return None

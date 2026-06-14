@@ -13,6 +13,7 @@ from app.models import DashboardData, ETFItem, QuantRecommend, LLMRecommend, Ref
 from app import sim_routes
 from app import backtest_routes
 from app import kline_routes
+from app import progress
 
 app = FastAPI(title="ETF操盘看板API", version="2.0.0")
 
