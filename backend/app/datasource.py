@@ -8,8 +8,8 @@ import pandas as pd
 
 logger = logging.getLogger(__name__)
 
-TUSHARE_TOKEN = "***REDACTED-TUSHARE-TOKEN***"
-TUSHARE_API_URL = "http://101.35.233.113:8020/"
+TUSHARE_TOKEN = os.environ.get("TUSHARE_TOKEN", "")
+TUSHARE_API_URL = os.environ.get("TUSHARE_API_URL", "http://101.35.233.113:8020/")
 
 DATA_SOURCE_ENV = "ETF_DATA_SOURCE"
 DEFAULT_DATA_SOURCE = "akshare"

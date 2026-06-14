@@ -101,17 +101,17 @@ ETF轮动策略量化看板，前后端分离架构。
 - `tushare_store.py`：tushare适配器
 - 环境变量 `ETF_DATA_SOURCE`：akshare（默认）/ tushare / auto
 
-### tushare凭证（已配置）
-- Token: `***REDACTED-TUSHARE-TOKEN***`
-- API: `http://101.35.233.113:8020/`
+### tushare凭证
+- 通过环境变量 `TUSHARE_TOKEN` 注入（参考 `.env.example`）
+- API 默认 `http://101.35.233.113:8020/`（可由 `TUSHARE_API_URL` 覆盖）
 
 ---
 
 ## [FEATURE] LLM热点推荐 — 2026-06-11
 
-### 配置（.env）
+### 配置（参考 `.env.example`）
 ```
-LLM_API_KEY=***REDACTED-LLM-API-KEY***
+LLM_API_KEY=<请填写自己的火山引擎 API Key>
 LLM_API_BASE=https://ark.cn-beijing.volces.com/api/coding/v3
 LLM_MODEL=deepseek-v4-pro
 ```

@@ -71,3 +71,8 @@ _git1247/
 _git1308/
 SESSION_HANDOFF_*.md
 
+# 临时数据 / 调试垃圾文件
+backend/neodata_multi.json
+backend/data/ohlcv_cache/
+backend/data/ohlcv_cache/*.parquet
+
