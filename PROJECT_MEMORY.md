@@ -568,8 +568,78 @@ aa92bcea fix(ui): 日期选择器
 
 ### 推荐下一步
 1. 用户最终验收 7 大功能（按上面清单）
-2. 确认通过后合并 `feat-v2.1-iter2-ui-and-perf` → `main`
+2. 确认通过后合并 `feat-v2.1-iter2-ui-and-perf` → `main` ✅ 已完成（commit 1097d165）
 3. 补充 batch_buy amount 字段的 pytest 覆盖
 4. 评估是否需要为 sina 30d_change 加备用源（避免单点失败）
+
+---
+
+## [SECURITY INCIDENT] 凭证泄露 + 防御加固 — 2026-06-12
+
+### 事件经过（v2.1 二次迭代合并到 main 时触发）
+1. **首次合并推送**（commit `1097d165`）到 `etf-strategies` 远端
+2. **泄露源**：
+   - `backend/app/datasource.py:9` 硬编码 `TUSHARE_TOKEN = "pntyccTNJHxw...VaoSBXKuBaab"`
+   - `PROJECT_MEMORY.md:114` 明文写入 `LLM_API_KEY=3b114cfe-398b-44c4-8e29-5cfdb7b886e6`
+3. **未及时发现**：我推送时未自动扫描敏感词（仅依赖 .gitignore）
+
+### 修复链路
+| 步骤 | 操作 | Commit |
+|---|---|---|
+| 1 | 替换硬编码 token → 环境变量读 | `3193fa9b` |
+| 2 | 重写历史（git filter-repo）替换 56 commits 中所有 token 字符串 | `5fd1429d` |
+| 3 | 配置 pre-commit hook + GitHub Actions secret-scan | `0ddc1a99` |
+| 4 | 用户到火山引擎平台作废 LLM API key | 外部动作 |
+
+### 当前安全状态
+- ✅ 火山引擎 LLM API key `3b114cfe-...`：**已作废**
+- 🟡 Tushare token：用户判定问题不大（内网 API + 外部难调通），未处理
+- ✅ 远端 main 当前代码：完全用环境变量读凭证
+- ✅ 远端 56 commits 历史：token 已替换为 `***REDACTED-***` 占位符
+- ⚠️ GitHub 旧 commit SHA 通过 raw URL 仍可访问（30-90 天 unreachable retention）—— 但 token 已作废，无实际危害
+
+### 配置变更（v2.1.1 强化）
+- **`.gitignore`**：已包含 `.env` / `node_modules` / `__pycache__` / `*.parquet` / `_git*` / `SESSION_HANDOFF_*.md` / `neodata_multi.json` / `data/ohlcv_cache/`
+- **`.env.example`**：新增模板，文档化所有环境变量
+- **`.pre-commit-config.yaml`**：detect-secrets + 7 个通用检查 + ruff
+- **`.secrets.baseline`**：当前已审核字符串基线（2.8KB）
+- **`.github/workflows/secret-scan.yml`**：CI 兜底，push/PR 时自动扫描
+- **`docs/PRE_COMMIT_GUIDE.md`**：团队接手指引
+
+### 防御体系（4 层）
+1. `.gitignore` 拦截明显的环境/缓存文件
+2. pre-commit hook（detect-secrets）—— 本地 commit 时实时扫描
+3. git push 上 GitHub
+4. GitHub Actions 兜底扫描 —— 即使本地 `--no-verify` 绕过也会被 CI 拦
+
+### 沉淀经验（必须牢记）
+- **推送前必须扫描敏感词**：未来所有 git commit 前自动跑 `python -m detect_secrets scan --baseline .secrets.baseline`
+- **PROHIBITED pattern**：永不在仓库中硬编码以下任何东西
+  - API key / token / secret / password
+  - 私钥（SSH / GPG / TLS）
+  - 数据库连接字符串（带密码）
+  - JWT / Bearer token
+- **凭证管理模板**：
+  - 代码用 `os.environ.get("KEY_NAME", "")` 读
+  - 本地配置放 `backend/.env`（git 忽略）
+  - 团队模板放 `.env.example`（git 跟踪，值为空）
+  - 文档引用 `参考 .env.example` 而不是直接写明文
+- **新项目 30 秒装好 pre-commit**：
+  ```powershell
+  Copy-Item <etf-strategies>\.pre-commit-config.yaml .
+  Copy-Item -Recurse <etf-strategies>\.github .
+  python -m detect_secrets scan > .secrets.baseline
+  python -m pre_commit install
+  ```
+- **重大泄露后 24h 内必做**：
+  1. 在平台作废 key
+  2. git filter-repo 重写历史 + force push
+  3. 旧 SHA 仍可能残留在 GitHub cache / Google index / Software Heritage / GitHub Archive，但 token 已作废不会造成实质损失
+  4. 写 SECURITY INCIDENT 进 PROJECT_MEMORY（**就是这条**）
+
+### 已知遗留
+- Tushare token 未作废（用户判定"内网 API + 外部难调通，问题不大"）—— 接受此风险
+- GitHub 旧 commit SHA 仍可访问 30-90 天 —— 不可控但已作废的 LLM key 无影响
+- PROJECT_MEMORY 中历史 token 字符串原条目已替换为"通过环境变量注入"—— 重写历史后 GitHub 远端干净
 
 
